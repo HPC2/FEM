@@ -55,3 +55,6 @@ dkms.conf
 
 # Custom
 Demo/hpc_demo0
+*.co
+*.el
+*.bd
