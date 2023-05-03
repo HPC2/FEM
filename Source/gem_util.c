@@ -27,5 +27,3 @@ gem *gem_free(gem *A)
     free (A);
     return (NULL) ; 
 }
-
-
