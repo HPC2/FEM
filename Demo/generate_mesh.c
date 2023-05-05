@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
     int n_cols = atoi(argv[2]); //anzahl an Spalten
     int n_proc = n_rows * n_cols;
 
-    char *pdir = "../Problem/";
+    char pdir[] = "../Problem/";
     char coords_fname[64]; sprintf(coords_fname, "%srectangle_%dx%d.co", pdir, n_rows, n_cols);
     char elems_fname[64]; sprintf(elems_fname, "%srectangle_%dx%d.el", pdir, n_rows, n_cols);
     char bds_fname[64]; sprintf(bds_fname, "%srectangle_%dx%d.bd", pdir, n_rows, n_cols);
@@ -21,14 +21,14 @@ int main(int argc, char **argv) {
     int n_nodes_row = n_rows + 1;
     int n_nodes_col = n_cols + 1;
     int n_nodes = n_nodes_row*n_nodes_col;
-    double* x_coords = malloc(sizeof(double)*n_nodes);
-    double* y_coords = malloc(sizeof(double)*n_nodes);
-    for (int i = 0; i < n_nodes_row; i++) {
-        for (int j = 0; j < n_nodes_col; j++) {
-            x_coords[i*n_nodes_col+j] = 1.0*i;
-            y_coords[i*n_nodes_col+j] = 1.0*j;
-            printf("%d:\t%d\t%d\n", i*n_nodes_col+j, i, j);
-            fprintf(f, "%.1lf\t%.1lf\n", 1.0*i, 1.0*j);
+    double* x_coords = (double*) malloc(sizeof(double)*n_nodes);
+    double* y_coords = (double*) malloc(sizeof(double)*n_nodes);
+    for (int i = 0; i < n_nodes_row; i++) {     // row_idx -> y-direction (vertical)
+        for (int j = 0; j < n_nodes_col; j++) { // col_idx -> x-direction (horizontal)
+            x_coords[i*n_nodes_col+j] = 1.0*j;
+            y_coords[i*n_nodes_col+j] = 1.0*i;
+            printf("%d:\t%d\t%d\n", i*n_nodes_col+j, j, i);
+            fprintf(f, "%.1lf\t%.1lf\n", 1.0*j, 1.0*i);
         }
     }
     fclose(f);
@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
     int n_edges_h = (n_rows+1) * n_cols;
     int n_edges_v = n_rows * (n_cols + 1);
 
-    int* elements = malloc(sizeof(int) * 7 * n_elems);
+    int* elements = (int*) malloc(sizeof(int) * 7 * n_elems);
     for (int i = 0; i < n_elems; i++) {
         int alpha = i / (2 * n_cols); // column index of element
         int beta = i / 2; // affiliation
