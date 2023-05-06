@@ -78,6 +78,21 @@ index sed_dupl (sed *A);
 index sed_gs_constr (const sed *A, const double *b, double *x, double *w, 
                      index *fixed, index nFixed, bool forward);
 
+/*
+Creates a rectangular mesh suited for dividing into n_rows*n_cols
+subprocesses.
+@param n_rows Number of rows
+@param n_cols Number of cols
+@param boundaries 4 x 1 array for boundary condition type in anti-clock wise ordering,
+starting with the lower boundary of the rectangle
+*/
+mesh *mesh_create_rect(index n_rows, index n_cols, bool *boundaries);
+/*
+Writes mesh to .co .el .bd files
+@param Mesh mesh to write
+@param fname filepath (without file extension)
+*/
+void mesh_write(mesh *Mesh, char* fname);
 mesh *mesh_alloc (index ncoord, index nelem, index nbdry);
 mesh *mesh_free (mesh *M);
 mesh *mesh_load (char *fname);

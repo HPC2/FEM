@@ -48,6 +48,7 @@ HPC = \
  hpc_malloc.o \
  mesh_buildRhs.o \
  mesh_load.o  \
+ mesh_create_rect.o  \
  mesh_getEdge2no.o \
  mesh_print.o  \
  mesh_refine.o  \

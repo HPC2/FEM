@@ -27,6 +27,9 @@ lib:
 hpc_demo0: lib hpc_demo0.c Makefile
 	$(CC) $(CF) $(I) -o hpc_demo0 hpc_demo0.c $(CS)
 
+gm: lib generate_mesh.c Makefile
+	$(CC) $(CF) $(I) -o gm generate_mesh.c $(CS)
+
 clean:
 	- $(RM) *.o
 
