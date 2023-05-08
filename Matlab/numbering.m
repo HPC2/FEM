@@ -21,5 +21,6 @@ for i=1:size(elements,1)
 end
 
 for j=1:rows*cols
+    % quicksort/mergesort und dann doppelte rauswerfen -> O(n*log(n))
     nodeslist{j} = unique(nodeslist{j}(1:node_ptr(j)-1));
 end
