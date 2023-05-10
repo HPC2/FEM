@@ -24,8 +24,12 @@ int main(int argc, char **argv) {
                      Mesh->elem, 
                     &Mesh->nedges,
                     &Mesh->edge2no);
-    mesh_print(Mesh, 0);
-    char fname[64]; sprintf(fname, "%srectangle_%dx%d", pdir, n_rows, n_cols);
-    mesh_write(Mesh, fname);
+    
+    get_local_to_global_numbering(Mesh, n_rows, n_cols);
+    
+    
+    //mesh_print(Mesh, 0);
+    //char fname[64]; sprintf(fname, "%srectangle_%dx%d", pdir, n_rows, n_cols);
+    //mesh_write(Mesh, fname);
     mesh_free(Mesh);
 }

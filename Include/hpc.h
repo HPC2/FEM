@@ -59,6 +59,9 @@ typedef struct mesh_data  /* mesh */
     index *fixed;     /* bdry ([n1,n2,m1,t1], [n3,n4,m2,t2], ...)          */
 } mesh ;
 
+index* get_local_to_global_numbering(mesh* M, const index rows, 
+                                              const index cols);
+
 /* utilities */
 void *hpc_realloc (void *p, index n, size_t size, index *ok);
 double hpc_cumsum (index *p, index *c, index n);
