@@ -60,7 +60,8 @@ typedef struct mesh_data  /* mesh */
 } mesh ;
 
 index* get_local_to_global_numbering(mesh* M, const index rows, 
-                                              const index cols);
+                                              const index cols,
+                                              index refinements);
 
 /* utilities */
 void *hpc_realloc (void *p, index n, size_t size, index *ok);

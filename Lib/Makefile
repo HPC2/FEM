@@ -53,7 +53,7 @@ HPC = \
  mesh_print.o  \
  mesh_refine.o  \
  mesh_getFixed.o  \
- mash_getNumbering.o \
+ mesh_getNumbering.o \
  mesh_util.o \
  blas_level1.o \
  blas_level2.o \
