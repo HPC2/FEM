@@ -1,6 +1,6 @@
 clc; clear; close all;
 
-elements = readmatrix('../Problem/rectangle_3x3_refined.el', 'FileType','text');
+elements = readmatrix('../Problem/rectangle_3x3_refined2.el', 'FileType','text');
 rows = 3;
 cols = 3;
 nof_nodes = 100 * cols*(rows-1) + rows*(cols-1); %ncoords in C

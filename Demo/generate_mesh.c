@@ -28,11 +28,17 @@ int main(int argc, char **argv) {
     int refinements = 2;
     for(int i=0; i<refinements; i++) {
         Mesh = mesh_refine(Mesh);
+        char fname[64]; sprintf(fname, "%srectangle_%dx%d_refined%dtimes", pdir, n_rows, n_cols, i+1);
+        mesh_write(Mesh, fname);
+        Mesh = mesh_load(fname);
     }
+
+
     //mesh_print(Mesh, 0);
     get_local_to_global_numbering(Mesh, n_rows, n_cols, refinements);
 
-    //char fname[64]; sprintf(fname, "%srectangle_%dx%d", pdir, n_rows, n_cols);
-    //mesh_write(Mesh, fname);
+    char fname[64]; sprintf(fname, "%srectangle_%dx%d_refined%dtimes", pdir, n_rows, n_cols, refinements);
+    mesh_write(Mesh, fname);
+
     mesh_free(Mesh);
 }
