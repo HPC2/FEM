@@ -1,4 +1,6 @@
 function plot_mesh(nodes,Element,BD)
+    %Input  (nodes,Element,BD)
+    %output (plot) 
 
     edges = Element(:, 4:6);
     Element = Element(:,1:3) + 1;
@@ -10,8 +12,7 @@ function plot_mesh(nodes,Element,BD)
     BD_mat(end+1,:) = BD_mat(1,:);
     plot(BD_mat(:,1),BD_mat(:,2),'r','LineWidth',2)
     
-    
-    
+   
     midpoints1 = (nodes(Element(:, 1), :) + nodes(Element(:, 2), :))/2;
     midpoints2 = (nodes(Element(:, 2), :) + nodes(Element(:, 3), :))/2;
     midpoints3 = (nodes(Element(:, 3), :) + nodes(Element(:, 1), :))/2;
