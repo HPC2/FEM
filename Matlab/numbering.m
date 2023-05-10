@@ -3,15 +3,15 @@ clc; clear; close all;
 elements = readmatrix('../Problem/rectangle_3x3_refined.el', 'FileType','text');
 rows = 3;
 cols = 3;
-nof_nodes_total = 100 * cols*(rows-1) + rows*(cols-1); %ncoords in C
+nof_nodes = 100 * cols*(rows-1) + rows*(cols-1); %ncoords in C
 
 node_idx = 1:3;
-m_idx    = 4:6;
+%m_idx    = 4:6;
 aff_idx  = 7;
 
 %node_ptr = ones(rows*cols,1); % which process is at which node(s)?, startet in C bei 0
 for j=1:rows*cols
-    nodeslist{j} = zeros(nof_nodes_total,1);
+    nodeslist{j} = zeros(nof_nodes,1);
 end
 
 for i=1:size(elements,1)
