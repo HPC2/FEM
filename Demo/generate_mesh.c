@@ -19,20 +19,21 @@ int main(int argc, char **argv) {
         printf("OOM\n");
         return 1;
     }
-
     mesh_getEdge2no( Mesh->nelem, 
                      Mesh->elem, 
                     &Mesh->nedges,
                     &Mesh->edge2no);
+    
     // refine the mesh
-    int refinements = 2;
+    int refinements = 3;
     for(int i=0; i<refinements; i++) {
         Mesh = mesh_refine(Mesh);
-        char fname[64]; sprintf(fname, "%srectangle_%dx%d_refined%dtimes", pdir, n_rows, n_cols, i+1);
-        mesh_write(Mesh, fname);
-        Mesh = mesh_load(fname);
+        // update edge/node info??
+        mesh_getEdge2no( Mesh->nelem, 
+                     Mesh->elem, 
+                    &Mesh->nedges,
+                    &Mesh->edge2no);
     }
-
 
     //mesh_print(Mesh, 0);
     get_local_to_global_numbering(Mesh, n_rows, n_cols, refinements);
