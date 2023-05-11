@@ -1,12 +1,14 @@
 function plot_mesh(nodes,Element,BD)
     %Input  (nodes,Element,BD)
     %output (plot) 
-
+    
+    figure;
+    
     edges = Element(:, 4:6);
     Element = Element(:,1:3) + 1;
     BD(:,1:2) = BD(:,1:2) + 1;
 
-    pdeplot(nodes', Element',ElementLabels="on",NodeLabels="on")
+    pdeplot(nodes', Element');%  ,"ElementLabels", "on", "NodeLabels", "on")
     hold on  
     BD_mat = nodes(BD(:,1),:);
     BD_mat(end+1,:) = BD_mat(1,:);
@@ -20,6 +22,9 @@ function plot_mesh(nodes,Element,BD)
     text(midpoints1(:, 1), midpoints1(:, 2), num2str(edges(:, 1)));
     text(midpoints2(:, 1), midpoints2(:, 2), num2str(edges(:, 2)));
     text(midpoints3(:, 1), midpoints3(:, 2), num2str(edges(:, 3)));
+    
+    node_names = erase("n"+num2str((0:size(nodes, 1)-1)'), " ");
+    text(nodes(:, 1), nodes(:, 2), node_names);
     
 
 
