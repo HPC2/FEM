@@ -1,4 +1,5 @@
 #include "hpc.h"
+#include <stdio.h>
 
 mesh *mesh_create_rect(index n_rows, index n_cols, bool *boundaries) {
     index n_nodes_row = n_rows + 1;
@@ -83,4 +84,69 @@ mesh *mesh_create_rect(index n_rows, index n_cols, bool *boundaries) {
     }
 
     return Mesh;
+}
+
+interface_data* rect_interface_data(mesh *Mesh, index n_rows, index n_cols, index n_refinments) {
+    index n_interfaces_h = (n_rows-1)*n_cols;
+    index n_interfaces_v = (n_cols-1)*n_rows;
+    interface_data* interfaces = malloc(sizeof(interface_data));
+    // crosspoints
+    interfaces->nCrossPts = Mesh->ncoord;
+    interfaces->crossPts = malloc(sizeof(index) * interfaces->nCrossPts);
+    for (int i = 0; i < interfaces->nCrossPts; i++) {
+        interfaces->crossPts[i] = i;
+    }
+    // interfaces
+    index n_interfaces = n_interfaces_h + n_interfaces_v;
+    interfaces->ncoupl = n_interfaces;
+    interfaces->coupl = malloc(sizeof(index) * 5 * n_interfaces);
+    interfaces->interf2edge = malloc(sizeof(index) * n_interfaces);
+    index* coupl = interfaces->coupl;
+    index offset = 0;
+    for (index i = 0; i < n_interfaces_h; i++) {
+        index beta = i / n_cols;
+        coupl[offset++] = beta + n_cols + i + 1;
+        coupl[offset++] = beta + n_cols + i + 2;
+        coupl[offset++] = n_cols + i;
+        coupl[offset++] = i;
+        coupl[offset++] = 0; // TODO: Color
+        interfaces->interf2edge[i] = n_cols + i;
+    }
+    for (index i = 0; i < n_interfaces_v; i++) {
+        index alpha = i % n_rows;
+        index beta = i / n_rows;
+        index gamma = i % (n_cols-1);
+        index delta = i / (n_cols-1);
+        coupl[offset++] = (n_cols+1)*alpha + beta +1;
+        coupl[offset++] = (n_cols+1)*alpha + beta +1 + n_cols + 1;
+        coupl[offset++] = n_cols*alpha + beta;
+        coupl[offset++] = n_cols*alpha + beta + 1;
+        coupl[offset++] = 0; // TODO: Color
+        interfaces->interf2edge[n_interfaces_h+i] = gamma + 
+            delta * (n_cols + 1) + 
+            n_cols*(n_rows+1) + 1;
+    }
+
+
+    // interface nodes
+    index* edge2no = Mesh->edge2no;
+    size_t nnpi = 1 << n_refinments - 1; // num (inner) nodes per interface
+    interfaces->icoupl = malloc(sizeof(index*) * n_interfaces);
+    interfaces->dcoupl = malloc(sizeof(index) * n_interfaces);
+    // printf("nnpi:%d\n", nnpi);
+    // printf("nedges:%d\n", Mesh->nedges);
+    for (index i = 0; i < n_interfaces; i++) {
+        interfaces->dcoupl[i] = nnpi;
+        index original_edge = interfaces->interf2edge[i];
+        interfaces->icoupl[i] = malloc(sizeof(index) * nnpi);
+        index* icoupl = interfaces->icoupl[i];
+        printf("i:%d\n", i);
+        for (index j = 0; j < nnpi; j++) {
+            printf("%zu, %zu\n", edge2no[2*((nnpi+1)*original_edge + j) + 0], edge2no[2*((nnpi+1)*original_edge + j) + 1]);
+            icoupl[j] = edge2no[2*((nnpi+1)*original_edge + j) + 1];
+        }
+        
+    }
+
+    return interfaces;
 }

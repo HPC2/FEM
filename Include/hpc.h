@@ -62,6 +62,17 @@ typedef struct mesh_data  /* mesh */
 index* get_local_to_global_numbering(mesh* M, const index rows, 
                                               const index cols,
                                               index refinements);
+                                              
+typedef struct interface_data
+{
+      index nCrossPts; /* number of all CrossPoints */
+      index* crossPts; /* crosspoints */
+      index ncoupl ; /* number of coupling interfaces */
+      index *coupl ; /* coupling interfaces ([a1,e1,l1,r1,c1], ... ) */
+      index *dcoupl ; /* number of nodes on interfaces (no crosspoints) */
+      index **icoupl ; /* vector of nodenumbers on interfaces (no crosspts) */
+      index *interf2edge; /* original edge number of the interface */
+} interface_data;
 
 /* utilities */
 void *hpc_realloc (void *p, index n, size_t size, index *ok);
@@ -97,6 +108,7 @@ Writes mesh to .co .el .bd files
 @param fname filepath (without file extension)
 */
 void mesh_write(mesh *Mesh, char* fname);
+interface_data* rect_interface_data(mesh* Mesh, index n_rows, index n_cols, index n_refinments);
 mesh *mesh_alloc (index ncoord, index nelem, index nbdry);
 mesh *mesh_free (mesh *M);
 mesh *mesh_load (char *fname);

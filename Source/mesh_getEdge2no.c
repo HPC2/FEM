@@ -28,8 +28,15 @@ index mesh_getEdge2no(const index nElem, const index *Elem,
     // Get endpoints for each edge, i.e. compute edgeno for the edges
     for ( k = 0 ; k < nElem ; k++){
       for ( j = 0 ; j < 3 ; j++){
-         (*edge2no)[2 * Elem[7 * k + j + 3]  ] = Elem[7 * k + j]; 
-         (*edge2no)[2 * Elem[7 * k + j + 3]+1] = Elem[7 * k + isucc[j]];
+        index n1 = Elem[7 * k + j];
+        index n2 = Elem[7 * k + isucc[j]];
+        if (n1 < n2) {
+            (*edge2no)[2 * Elem[7 * k + j + 3]  ] = n1; 
+            (*edge2no)[2 * Elem[7 * k + j + 3]+1] = n2;
+        } else {
+            (*edge2no)[2 * Elem[7 * k + j + 3]  ] = n2; 
+            (*edge2no)[2 * Elem[7 * k + j + 3]+1] = n1;
+        }
       }
     }
     return(1);
