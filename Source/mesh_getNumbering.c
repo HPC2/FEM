@@ -80,4 +80,5 @@ non-existent nodes are marked with -1
         numbering[local_numbering[i]] = i;
     }
 
+    return numbering;
 }
