@@ -1,9 +1,14 @@
 #include "hpc.h"
 #include<stdio.h>
+#include<assert.h>
 
 index* get_local_to_global_numbering(mesh* M, const index rows, 
                                               const index cols,
                                               index refinements) {
+/*
+returns an index matrix where the rows are the permutation vector for each processor
+*/
+
     index nof_nodes    = M->ncoord;
     printf("there are %zu nodes in total\n", nof_nodes);
     index* elements    = M->elem;
@@ -35,7 +40,7 @@ index* get_local_to_global_numbering(mesh* M, const index rows,
         */
     }
 
-    index nodes_per_processor = (index) pow(pow(2,refinements)+1,2);
+    index nodes_per_processor = (index) pow(pow(2,refinements)+1,2); // (2^f + 1)^2
     printf("there are %zu nodes per processor:\n", nodes_per_processor);
     index* numbering = malloc(nodes_per_processor*(rows*cols) * sizeof(index));
 
@@ -48,6 +53,7 @@ index* get_local_to_global_numbering(mesh* M, const index rows,
                 numbering[i*nodes_per_processor + nodes_found++] = j;
             }
         }
+        assert(nodes_found == nodes_per_processor);
         printf("\n");
     }
 
@@ -56,4 +62,22 @@ index* get_local_to_global_numbering(mesh* M, const index rows,
     }
 
     return numbering;
+}
+
+index* get_global_to_local_numbering(index* local_numbering, 
+                                     index  nof_local_nodes, // nodes per processor = (2^f+1)^2
+                                     index  nof_global_nodes) {
+/*
+returns the permutation vector for the global to local numbering
+non-existent nodes are marked with -1
+*/                  
+    index* numbering = (index*) malloc(nof_global_nodes*sizeof(index));
+    for(int j=0; j<nof_global_nodes; j++) {
+        numbering[j] = -1;
+    }
+
+    for(int i=0; i<nof_local_nodes; i++) {
+        numbering[local_numbering[i]] = i;
+    }
+
 }
