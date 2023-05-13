@@ -1,25 +1,47 @@
-n_cols = 2;
-n_rows = 4;
+clear 
+close all
 
-fprintf("Source\tTarget\tPleft\tPright\tCorrespondingMidpoint\n")
-for i=0:(n_rows-1)*n_cols-1
-    beta = fix(i/n_cols);
-    source = beta + n_cols + i + 1;
-    target = beta + n_cols + i + 2;
-    left_p = n_cols + i;
-    right_p = i;
-    corresponding_midpoint = n_cols + i;
-    fprintf("%i\t%i\t%i\t%i\t%i\n",source,target,left_p,right_p,corresponding_midpoint)
+n_rows = 4;
+n_cols = 3;
+
+
+fprintf("Source\tTarget\tPleft\tPrigh\tMidP\n")
+
+source_offset        = n_cols + 1;
+target_offset        = n_cols + 2;
+left_process_offset  = n_cols;
+right_process_offset = 0;
+midpoint_offset      = n_cols;
+
+for i=0 : n_cols * (n_rows - 1) - 1
+    
+    beta     = fix(i/n_cols);   
+
+    source   = beta + i + source_offset;
+    target   = beta + i + target_offset;
+    left_p   =        i + left_process_offset;
+    right_p  =        i + right_process_offset;
+    midpoint =        i + midpoint_offset;
+    
+
+    fprintf("%i\t%i\t%i\t%i\t%i\n",source,target,left_p,right_p,midpoint);
 end
-for i=0:(n_cols-1)*n_rows-1
-    alpha = mod(i,n_rows);
-    beta = fix(i/n_rows);
-    gamma = mod(i,n_cols-1);
-    delta = fix(i/(n_cols-1));
-    source = (n_cols+1)*alpha + beta +1;
-    target = (n_cols+1)*alpha + beta +1 + n_cols + 1;
-    left_p =  n_cols*alpha + beta;
-    right_p = n_cols*alpha + beta + 1;
-    corresponding_midpoint = gamma + delta * (n_cols + 1) + n_cols*(n_rows+1) + 1;
-    fprintf("%i\t%i\t%i\t%i\t%i\n",source,target,left_p,right_p,corresponding_midpoint)
+
+source_offset        = 1;
+target_offset        = n_cols + 2;
+left_process_offset  = 0;
+right_process_offset = 1;
+midpoint_offset      = n_cols*(n_rows+1) + 1;
+
+for i=0 : (n_cols - 1) * n_rows - 1
+    
+    beta = fix(i/(n_cols-1)); % Obacht: -1
+
+    source   = 2 * beta + i + source_offset;
+    target   = 2 * beta + i + target_offset;
+    left_p   =     beta + i + left_process_offset;
+    right_p  =     beta + i + right_process_offset;
+    midpoint = 2 * beta + i + midpoint_offset;
+
+    fprintf("%i\t%i\t%i\t%i\t%i\n",source,target,left_p,right_p,midpoint);
 end
