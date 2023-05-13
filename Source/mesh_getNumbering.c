@@ -18,13 +18,13 @@ returns an index matrix where the rows are the permutation vector for each proce
 
     // allocate bool arrays for each processor
     for(int i=0; i<rows*cols; i++) {   
-        nodeslist[i] = (bool*) calloc(nof_nodes, sizeof(bool));
+        nodeslist[i] = (bool*) calloc(nof_nodes, sizeof(bool)); //zero-allocated
     }
 
     // set node numbers of each processor/affiliation to true
     for(int i=0; i<nof_elements; i++) {
         index affiliation = elements[i*7 + 6];
-        printf("processor %zu: found nodes %zu, %zu and %zu\n", affiliation,elements[i*7 + 0],elements[i*7 + 1],elements[i*7 + 2]);
+        //printf("processor %zu: found nodes %zu, %zu and %zu\n", affiliation,elements[i*7 + 0],elements[i*7 + 1],elements[i*7 + 2]);
         nodeslist[affiliation][elements[i*7 + 0]] = true;
         nodeslist[affiliation][elements[i*7 + 1]] = true;
         nodeslist[affiliation][elements[i*7 + 2]] = true;
@@ -49,12 +49,12 @@ returns an index matrix where the rows are the permutation vector for each proce
         for(int j=0; j<nof_nodes; j++) {
             //printf("%d", nodeslist[i][j]);
             if(nodeslist[i][j] == true) {
-                printf("%d ",j);
+                //printf("%d ",j);
                 numbering[i*nodes_per_processor + nodes_found++] = j;
             }
         }
         assert(nodes_found == nodes_per_processor);
-        printf("\n");
+        //printf("\n");
     }
 
     for(int i=0; i<rows*cols; i++) {
@@ -68,6 +68,10 @@ index* get_global_to_local_numbering(index* local_numbering,
                                      index  nof_local_nodes, // nodes per processor = (2^f+1)^2
                                      index  nof_global_nodes) {
 /*
+Inputs: -local-to-global numbering of ONE processor
+        -number of local nodes
+        -number of global nodes
+
 returns the permutation vector for the global to local numbering
 non-existent nodes are marked with -1
 */                  
