@@ -126,6 +126,11 @@ int main(int argc, char **argv) {
         }
         printf("\n");
     }
+
+    // TODO
+    // speicher freigeben
+    // colors
+    // interfaces in lokalem numbering (und nicht globalem)
     
     MPI_Finalize();
 }
