@@ -56,6 +56,7 @@ dkms.conf
 # Custom
 Demo/hpc_demo0
 Demo/gm
+Demo/mpi_mesh_split
 *.co
 *.el
 *.bd
