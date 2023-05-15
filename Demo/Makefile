@@ -30,6 +30,9 @@ hpc_demo0: lib hpc_demo0.c Makefile
 gm: lib generate_mesh.c Makefile
 	$(CC) $(CF) $(I) -o gm generate_mesh.c $(CS)
 
+mpi: lib mpi_mesh_split.c Makefile
+	mpicc $(CF) $(I) -o mpi_mesh_split mpi_mesh_split.c $(CS)
+
 clean:
 	- $(RM) *.o
 

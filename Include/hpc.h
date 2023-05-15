@@ -65,14 +65,24 @@ index* get_local_to_global_numbering(mesh* M, const index rows,
                                               
 typedef struct interface_data
 {
-      index nCrossPts; /* number of all CrossPoints */
-      index* crossPts; /* crosspoints */
-      index ncoupl ; /* number of coupling interfaces */
-      index *coupl ; /* coupling interfaces ([a1,e1,l1,r1,c1], ... ) */
+      index ncoupl ; /* global number of coupling interfaces */
+      index *coupl ; /* global coupling interfaces ([a1,e1,l1,r1,c1], ... ) */
       index *dcoupl ; /* number of nodes on interfaces (no crosspoints) */
       index **icoupl ; /* vector of nodenumbers on interfaces (no crosspts) */
-      index *interf2edge; /* original edge number of the interface */
+      index *interface_counts; /* num interfaces for each processor*/
+      index **interface_ids; /* interface ids for each processor */
 } interface_data;
+
+typedef struct coupling_data
+{
+      index nCrossPts; /* number of all CrossPoints */
+      index* crossPts; /* crosspoints */
+      index* l2g; /* local to global node numbering */
+      index ncoupl ; /* local number of coupling interfaces */
+      index *coupl ; /* local coupling interfaces ([a1,e1,l1,r1,c1], ... ) */
+      index *dcoupl ; /* number of nodes on interfaces (no crosspoints) */
+      index **icoupl ; /* vector of nodenumbers on interfaces (no crosspts) */
+} coupling_data;
 
 /* utilities */
 void *hpc_realloc (void *p, index n, size_t size, index *ok);
@@ -92,7 +102,7 @@ index sed_print (const sed *A, index brief);
 index sed_dupl (sed *A);
 index sed_gs_constr (const sed *A, const double *b, double *x, double *w, 
                      index *fixed, index nFixed, bool forward);
-
+                     
 /*
 Creates a rectangular mesh suited for dividing into n_rows*n_cols
 subprocesses.
@@ -116,6 +126,7 @@ index *mesh_getFixed(const index nCoord, const index *bdry,
                      const index nBdry, index *nFixed);
 index mesh_print (const mesh *M, index brief);
 mesh *mesh_refine(const mesh *In);
+mesh* mesh_multi_refine(mesh* in, int refinements);
 index mesh_getEdge2no(const index nElem, const index *Elem, 
                       index *nEdges, index** edge2no);
 

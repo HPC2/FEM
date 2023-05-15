@@ -94,5 +94,33 @@ mesh *mesh_refine(const mesh *In)
     return (Out) ;
 }
 
+mesh* mesh_multi_refine(mesh* in, int refinements) {
+    mesh *H[2];
+    H[0] = in;
+
+    mesh_getEdge2no( H[0]->nelem, 
+                     H[0]->elem, 
+                    &H[0]->nedges,
+                    &H[0]->edge2no);
+
+    for (size_t i=0; i < refinements; ++i)
+    {
+        // Refine
+        H[1] = mesh_refine(H[0]);
+
+        // Get the edge to node information (necessary for refine)
+        mesh_getEdge2no( H[1]->nelem, 
+                         H[1]->elem, 
+                        &H[1]->nedges,
+                        &H[1]->edge2no);
+
+        if (mesh_free(H[0]) != NULL) {return(0);}
+        H[0] = H[1];
+    }
+
+    return H[0];
+
+}
+
 
 

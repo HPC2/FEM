@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
                     &Mesh->edge2no);
     
     // refine the mesh
-    int refinements = 3;
+    int refinements = 1;
     for(int i=0; i<refinements; i++) {
         Mesh = mesh_refine(Mesh);
         // update edge/node info??
@@ -35,9 +35,7 @@ int main(int argc, char **argv) {
                     &Mesh->edge2no);
     }
 
-    //mesh_print(Mesh, 0);
-    get_local_to_global_numbering(Mesh, n_rows, n_cols, refinements);
-
+    mesh_print(Mesh, 0);
     char fname[64]; sprintf(fname, "%srectangle_%dx%d_refined%dtimes", pdir, n_rows, n_cols, refinements);
     mesh_write(Mesh, fname);
 

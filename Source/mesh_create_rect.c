@@ -89,42 +89,44 @@ mesh *mesh_create_rect(index n_rows, index n_cols, bool *boundaries) {
 interface_data* rect_interface_data(mesh *Mesh, index n_rows, index n_cols, index n_refinments) {
     index n_interfaces_h = (n_rows-1)*n_cols;
     index n_interfaces_v = (n_cols-1)*n_rows;
+    index n_proc = n_rows*n_cols;
     interface_data* interfaces = malloc(sizeof(interface_data));
-    // crosspoints
-    interfaces->nCrossPts = Mesh->ncoord;
-    interfaces->crossPts = malloc(sizeof(index) * interfaces->nCrossPts);
-    for (int i = 0; i < interfaces->nCrossPts; i++) {
-        interfaces->crossPts[i] = i;
-    }
+
     // interfaces
     index n_interfaces = n_interfaces_h + n_interfaces_v;
     interfaces->ncoupl = n_interfaces;
     interfaces->coupl = malloc(sizeof(index) * 5 * n_interfaces);
-    interfaces->interf2edge = malloc(sizeof(index) * n_interfaces);
+    index* interf2edge = malloc(sizeof(index) * n_interfaces);
     index* coupl = interfaces->coupl;
     index offset = 0;
+    index source_offset        = n_cols + 1;
+    index target_offset        = n_cols + 2;
+    index left_process_offset  = n_cols;
+    index right_process_offset = 0;
+    index midpoint_offset      = n_cols;
     for (index i = 0; i < n_interfaces_h; i++) {
         index beta = i / n_cols;
-        coupl[offset++] = beta + n_cols + i + 1;
-        coupl[offset++] = beta + n_cols + i + 2;
-        coupl[offset++] = n_cols + i;
-        coupl[offset++] = i;
+        coupl[offset++] = beta + i + source_offset;
+        coupl[offset++] = beta + i + target_offset;
+        coupl[offset++] = i + left_process_offset;
+        coupl[offset++] = i + right_process_offset;
         coupl[offset++] = 0; // TODO: Color
-        interfaces->interf2edge[i] = n_cols + i;
+        interf2edge[i] = i + midpoint_offset;
     }
+    source_offset        = 1;
+    target_offset        = n_cols + 2;
+    left_process_offset  = 0;
+    right_process_offset = 1;
+    midpoint_offset      = n_cols*(n_rows+1) + 1;
     for (index i = 0; i < n_interfaces_v; i++) {
-        index alpha = i % n_rows;
-        index beta = i / n_rows;
-        index gamma = i % (n_cols-1);
-        index delta = i / (n_cols-1);
-        coupl[offset++] = (n_cols+1)*alpha + beta +1;
-        coupl[offset++] = (n_cols+1)*alpha + beta +1 + n_cols + 1;
-        coupl[offset++] = n_cols*alpha + beta;
-        coupl[offset++] = n_cols*alpha + beta + 1;
+        index beta = i/(n_cols-1);
+        coupl[offset++] = 2 * beta + i + source_offset;
+        coupl[offset++] = 2 * beta + i + target_offset;
+        coupl[offset++] = beta + i + left_process_offset;
+        coupl[offset++] = beta + i + right_process_offset;
         coupl[offset++] = 0; // TODO: Color
-        interfaces->interf2edge[n_interfaces_h+i] = gamma + 
-            delta * (n_cols + 1) + 
-            n_cols*(n_rows+1) + 1;
+        interf2edge[n_interfaces_h+i] = 
+            2 * beta + i + midpoint_offset;
     }
 
 
@@ -137,16 +139,32 @@ interface_data* rect_interface_data(mesh *Mesh, index n_rows, index n_cols, inde
     // printf("nedges:%d\n", Mesh->nedges);
     for (index i = 0; i < n_interfaces; i++) {
         interfaces->dcoupl[i] = nnpi;
-        index original_edge = interfaces->interf2edge[i];
+        index original_edge = interf2edge[i];
         interfaces->icoupl[i] = malloc(sizeof(index) * nnpi);
         index* icoupl = interfaces->icoupl[i];
-        printf("i:%d\n", i);
+        // printf("i:%d\n", i);
         for (index j = 0; j < nnpi; j++) {
-            printf("%zu, %zu\n", edge2no[2*((nnpi+1)*original_edge + j) + 0], edge2no[2*((nnpi+1)*original_edge + j) + 1]);
+            // printf("%zu, %zu\n", edge2no[2*((nnpi+1)*original_edge + j) + 0], edge2no[2*((nnpi+1)*original_edge + j) + 1]);
             icoupl[j] = edge2no[2*((nnpi+1)*original_edge + j) + 1];
         }
         
     }
+
+    index* interface_counts = calloc(n_proc, sizeof(index));
+    interfaces->interface_ids = malloc(sizeof(index*)*n_proc);
+    index** interface_ids = interfaces->interface_ids;
+    for (int i = 0; i < n_proc; i++) {
+        interface_ids[i] = malloc(sizeof(index)*4);
+    }
+    for (int i = 0; i < interfaces->ncoupl; i++) {
+        index left = interfaces->coupl[i*5 + 2];
+        index right = interfaces->coupl[i*5 + 3];
+        interface_ids[left][interface_counts[left]] = i;
+        interface_ids[right][interface_counts[right]] = i;
+        interface_counts[left]++;
+        interface_counts[right]++;
+    }
+    interfaces->interface_counts = interface_counts;
 
     return interfaces;
 }

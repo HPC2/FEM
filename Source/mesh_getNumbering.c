@@ -10,7 +10,7 @@ returns an index matrix where the rows are the permutation vector for each proce
 */
 
     index nof_nodes    = M->ncoord;
-    printf("there are %zu nodes in total\n", nof_nodes);
+    // printf("there are %zu nodes in total\n", nof_nodes);
     index* elements    = M->elem;
     index nof_elements = M->nelem;
 
@@ -41,7 +41,7 @@ returns an index matrix where the rows are the permutation vector for each proce
     }
 
     index nodes_per_processor = (index) pow(pow(2,refinements)+1,2); // (2^f + 1)^2
-    printf("there are %zu nodes per processor:\n", nodes_per_processor);
+    // printf("there are %zu nodes per processor:\n", nodes_per_processor);
     index* numbering = malloc(nodes_per_processor*(rows*cols) * sizeof(index));
 
     for(int i=0; i<rows*cols; i++) {
@@ -49,12 +49,12 @@ returns an index matrix where the rows are the permutation vector for each proce
         for(int j=0; j<nof_nodes; j++) {
             //printf("%d", nodeslist[i][j]);
             if(nodeslist[i][j] == true) {
-                //printf("%d ",j);
+                // printf("%zu ",j);
                 numbering[i*nodes_per_processor + nodes_found++] = j;
             }
         }
         assert(nodes_found == nodes_per_processor);
-        //printf("\n");
+        // printf("\n");
     }
 
     for(int i=0; i<rows*cols; i++) {
