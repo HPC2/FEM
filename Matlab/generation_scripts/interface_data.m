@@ -1,8 +1,8 @@
 clear 
 close all
 
-n_rows = 2;
-n_cols = 2;
+n_rows = 4;
+n_cols = 4;
 
 
 fprintf("Source\tTarget\tPleft\tPrigh\tMidP\tColor\n")
@@ -44,7 +44,7 @@ for i=0 : (n_cols - 1) * n_rows - 1
     left_p   =     beta + i + left_process_offset;
     right_p  =     beta + i + right_process_offset;
     midpoint = 2 * beta + i + midpoint_offset;
-    color    = mod(alpha + mod(beta,2) + 1,2); % Obacht: +1
+    color    = mod(alpha + mod(beta,2) + 1,2) + 2; % Obacht: +1
 
     fprintf("%i\t%i\t%i\t%i\t%i\t%i\n",source,target,left_p,right_p,midpoint,color);
 end
