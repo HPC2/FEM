@@ -43,6 +43,11 @@ int main(int argc, char **argv) {
         interfaces = rect_interface_data(global_mesh, n_rows, n_cols, refinements);
         l2g_numbering = get_local_to_global_numbering(global_mesh, n_rows, n_cols, refinements);
         mesh_free(global_mesh);
+
+        // Save interfaces for debug
+        char fname[200];
+        sprintf(fname,"../Problem/interface_data_%dx%d",n_rows,n_cols);
+        interface_data_write(interfaces, fname);
     }
 
     mesh* local_mesh = mesh_create_rect(1, 1, boundaries);

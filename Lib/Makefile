@@ -46,6 +46,7 @@ HPC = \
  gem_util.o  \
  hpc_cumsum.o \
  hpc_malloc.o \
+ interface_util.o \
  mesh_buildRhs.o \
  mesh_load.o  \
  mesh_create_rect.o  \

@@ -85,6 +85,8 @@ typedef struct coupling_data
 } coupling_data;
 
 /* utilities */
+void interface_data_write(interface_data *interface_data, char* fname);
+
 void *hpc_realloc (void *p, index n, size_t size, index *ok);
 double hpc_cumsum (index *p, index *c, index n);
  
