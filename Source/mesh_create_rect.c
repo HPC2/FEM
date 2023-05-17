@@ -105,12 +105,13 @@ interface_data* rect_interface_data(mesh *Mesh, index n_rows, index n_cols, inde
     index right_process_offset = 0;
     index midpoint_offset      = n_cols;
     for (index i = 0; i < n_interfaces_h; i++) {
+        index alpha = i % n_cols;
         index beta = i / n_cols;
         coupl[offset++] = beta + i + source_offset;
         coupl[offset++] = beta + i + target_offset;
         coupl[offset++] = i + left_process_offset;
         coupl[offset++] = i + right_process_offset;
-        coupl[offset++] = 0; // TODO: Color
+        coupl[offset++] = (alpha + (beta % 2)) % 2;
         interf2edge[i] = i + midpoint_offset;
     }
     source_offset        = 1;
@@ -119,12 +120,13 @@ interface_data* rect_interface_data(mesh *Mesh, index n_rows, index n_cols, inde
     right_process_offset = 1;
     midpoint_offset      = n_cols*(n_rows+1) + 1;
     for (index i = 0; i < n_interfaces_v; i++) {
+        index alpha = i % (n_cols-1);
         index beta = i/(n_cols-1);
         coupl[offset++] = 2 * beta + i + source_offset;
         coupl[offset++] = 2 * beta + i + target_offset;
         coupl[offset++] = beta + i + left_process_offset;
         coupl[offset++] = beta + i + right_process_offset;
-        coupl[offset++] = 0; // TODO: Color
+        coupl[offset++] = (alpha + (beta % 2) + 1) % 2;
         interf2edge[n_interfaces_h+i] = 
             2 * beta + i + midpoint_offset;
     }

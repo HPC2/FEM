@@ -1,8 +1,8 @@
 clear 
 close all
 
-n_rows = 4;
-n_cols = 3;
+n_rows = 2;
+n_cols = 2;
 
 
 fprintf("Source\tTarget\tPleft\tPrigh\tMidP\tColor\n")
