@@ -63,3 +63,4 @@ Demo/mpi_mesh_split
 *.json
 *.asv
 *.if
+*.l2g
