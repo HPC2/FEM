@@ -14,7 +14,7 @@
 #       cd ../Demo ; make
 #
 
-CC = gcc
+CC = mpicc
 
 LIBRARY = libhpc
 
@@ -58,7 +58,8 @@ HPC = \
  mesh_util.o \
  blas_level1.o \
  blas_level2.o \
- blas_aux.o 
+ blas_aux.o \
+ mpi_split_interfaces.o
 
 
 $(HPC): ../Include/hpc.h Makefile
