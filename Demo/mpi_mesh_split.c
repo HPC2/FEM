@@ -31,23 +31,39 @@ int main(int argc, char **argv) {
     interface_data* interfaces;
 
     if (rank == 0) {
-        
+        // Global mesh
         mesh* global_mesh = mesh_create_rect(n_rows, n_cols, boundaries);
         if(!global_mesh) {
             printf("OOM\n");
             return 1;
         }
 
+        // Save global mesh before refining for debug
+        char fname_glob_mesh_pre_ref[200];
+        sprintf(fname_glob_mesh_pre_ref,"../Problem/rectangle_%dx%d_global_0ref",n_rows,n_cols);
+        mesh_write(global_mesh, fname_glob_mesh_pre_ref);
+
+        // Refine
         global_mesh = mesh_multi_refine(global_mesh, refinements);
 
-        interfaces = rect_interface_data(global_mesh, n_rows, n_cols, refinements);
+        // Save global mesh after refining for debug
+        char fname_glob_mesh_post_ref[200];
+        sprintf(fname_glob_mesh_post_ref,"../Problem/rectangle_%dx%d_global_%dref",n_rows,n_cols,refinements);
+        mesh_write(global_mesh, fname_glob_mesh_post_ref);
+
+        // Numbering
         l2g_numbering = get_local_to_global_numbering(global_mesh, n_rows, n_cols, refinements);
-        mesh_free(global_mesh);
+
+        // Interfaces
+        interfaces = rect_interface_data(global_mesh, n_rows, n_cols, refinements);
 
         // Save interfaces for debug
-        char fname[200];
-        sprintf(fname,"../Problem/rectangle_%dx%d",n_rows,n_cols);
-        interface_data_write(interfaces, fname);
+        char fname_interfaces[200];
+        sprintf(fname_interfaces,"../Problem/rectangle_%dx%d",n_rows,n_cols);
+        interface_data_write(interfaces, fname_interfaces);
+
+        // Free relevant stuff in this scope
+        mesh_free(global_mesh);
     }
 
     mesh* local_mesh = mesh_create_rect(1, 1, boundaries);
