@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
 
         // Save interfaces for debug
         char fname[200];
-        sprintf(fname,"../Problem/interface_data_%dx%d",n_rows,n_cols);
+        sprintf(fname,"../Problem/rectangle_%dx%d",n_rows,n_cols);
         interface_data_write(interfaces, fname);
     }
 
