@@ -53,7 +53,10 @@ int main(int argc, char **argv) {
 
         // Numbering
         l2g_numbering = get_local_to_global_numbering(global_mesh, n_rows, n_cols, refinements);
-
+        
+        // write the local to global numbering
+        write_l2g(l2g_numbering, n_rows, n_cols, refinements);
+        
         // Interfaces
         interfaces = rect_interface_data(global_mesh, n_rows, n_cols, refinements);
 

@@ -1,9 +1,9 @@
 #include "hpc.h"
 
-void print_matrix(index* A, index rows, index cols, bool colmajor, char* name, char* extension) {
+void print_matrix(index* A, index rows, index cols, bool rowmajor, char* name, char* extension) {
     
-    index incRow = colmajor? cols : 1;
-    index incCol = colmajor? 1 : rows;
+    index incRow = rowmajor? cols : 1;
+    index incCol = rowmajor? 1 : rows;
  
     char filename[64]; sprintf(filename, "%s.%s", name, extension);
 

@@ -59,7 +59,9 @@ HPC = \
  blas_level1.o \
  blas_level2.o \
  blas_aux.o \
- mpi_split_interfaces.o
+ mpi_split_interfaces.o \
+ matrix_print.o \
+ numbering_write_l2g.o
 
 
 $(HPC): ../Include/hpc.h Makefile

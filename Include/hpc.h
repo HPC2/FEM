@@ -115,6 +115,27 @@ subprocesses.
 starting with the lower boundary of the rectangle
 */
 mesh *mesh_create_rect(index n_rows, index n_cols, bool *boundaries);
+
+/*
+writes a matrix as file "filename.extension"
+@param A Pointer to a matrix
+@param rows Number of rows
+@param cols Number of columns
+@param rowmajor true for row-major matrices, false for col-major
+@param name Name of the file
+@param extension File extension of the file
+*/
+void print_matrix(index* A, index rows, index cols, bool rowmajor, char* name, char* extension);
+
+/*
+writes the local to global numbering matrix
+@param l2g_numbering Pointer to the matrix 
+@param n_rows the number of row processors
+@param n_cols the number of column processors
+@param refinements Number of refinements
+*/
+void write_l2g(index* l2g_numbering, index n_rows, index n_cols, index refinements);
+
 /*
 Writes mesh to .co .el .bd files
 @param Mesh mesh to write
