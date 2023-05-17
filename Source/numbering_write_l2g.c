@@ -1,4 +1,4 @@
-#inlcude "hpc.h"
+#include "hpc.h"
 
 void write_l2g(index* l2g_numbering, index n_rows, index n_cols, index refinements) {
 
