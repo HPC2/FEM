@@ -126,7 +126,7 @@ interface_data* rect_interface_data(mesh *Mesh, index n_rows, index n_cols, inde
         coupl[offset++] = 2 * beta + i + target_offset;
         coupl[offset++] = beta + i + left_process_offset;
         coupl[offset++] = beta + i + right_process_offset;
-        coupl[offset++] = (alpha + (beta % 2) + 1) % 2;
+        coupl[offset++] = (alpha + (beta % 2) + 1) % 2 + 2;
         interf2edge[n_interfaces_h+i] = 
             2 * beta + i + midpoint_offset;
     }

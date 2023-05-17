@@ -2,8 +2,8 @@ clear
 close all
 
 
-[nodes, elements, boundaries] = hpc_utils.load_problem("rectangle_2x2");
-interfaces = hpc_utils.load_interfaces("rectangle_2x2");
+[nodes, elements, boundaries] = hpc_utils.load_problem("rectangle_3x3");
+interfaces = hpc_utils.load_interfaces("rectangle_3x3");
 
 figure();
 

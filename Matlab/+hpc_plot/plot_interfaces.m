@@ -5,7 +5,7 @@ addRequired(p, "nodes");
 addParameter(p, 'x_offset', -0.05);
 addParameter(p, 'y_offset', -0.05);
 addParameter(p, 'shrink', 0.2);
-addParameter(p, "colors", ["#455DBA", "#BAA245"]);
+addParameter(p, "colors", ["green", "magenta", "red", "blue"]);
 parse(p, interfaces, nodes, varargin{:});
 
 offset = [p.Results.x_offset, p.Results.y_offset];
