@@ -12,7 +12,7 @@ y_offset = -0.05;
 for node_id = 0:size(nodes, 1) - 1
     x = nodes(node_id+1, 1) + x_offset;
     y = nodes(node_id+1, 2) + y_offset;
-    text(x, y, sprintf(format_str, node_id), "Color", "red");
+    text(x, y, sprintf(format_str, node_id), "Color", "red", "Clipping", "on");
 end
 
 if ~was_holded

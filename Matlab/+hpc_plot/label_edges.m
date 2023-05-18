@@ -31,21 +31,21 @@ for i = 1:size(elements, 1)
     if ~was_labeled(edge_id_1+1)
         x = mean(nodes([node_id_1 + 1, node_id_2 + 1], 1)) + x_offset;
         y = mean(nodes([node_id_1 + 1, node_id_2 + 1], 2)) + y_offset;
-        text(x, y, sprintf(format_str, edge_id_1), "Color", color);
+        text(x, y, sprintf(format_str, edge_id_1), "Color", color, "Clipping", "on");
         was_labeled(edge_id_1+1) = true;
     end
 
     if ~was_labeled(edge_id_2+1)
         x = mean(nodes([node_id_2 + 1, node_id_3 + 1], 1)) + x_offset;
         y = mean(nodes([node_id_2 + 1, node_id_3 + 1], 2)) + y_offset;
-        text(x, y, sprintf(format_str, edge_id_2), "Color", color);
+        text(x, y, sprintf(format_str, edge_id_2), "Color", color, "Clipping", "on");
         was_labeled(edge_id_2+1) = true;
     end
 
     if ~was_labeled(edge_id_3+1)
         x = mean(nodes([node_id_3 + 1, node_id_1 + 1], 1)) + x_offset;
         y = mean(nodes([node_id_3 + 1, node_id_1 + 1], 2)) + y_offset;
-        text(x, y, sprintf(format_str, edge_id_3), "Color", color);
+        text(x, y, sprintf(format_str, edge_id_3), "Color", color, "Clipping", "on");
         was_labeled(edge_id_3+1) = true;
     end
 end

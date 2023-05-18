@@ -26,7 +26,7 @@ for i = 1:size(interfaces, 1)
     x = mean([nodes(node_id_1+1, 1), nodes(node_id_2+1, 1)]) + x_offset;
     y = mean([nodes(node_id_1+1, 2), nodes(node_id_2+1, 2)]) + y_offset;
     text_str = sprintf(format_str, node_id_1, node_id_2, p_left, p_right, c);
-    text(x, y, text_str, "Color", color);
+    text(x, y, text_str, "Color", color, "Clipping", "on");
 
 end
 

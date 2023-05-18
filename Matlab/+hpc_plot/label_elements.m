@@ -12,7 +12,7 @@ for i = 1:size(elements, 1)
         if ~was_labeled(i)
             x = mean(nodes(elements(i, 1:3)+1, 1)) + x_offset;
             y = mean(nodes(elements(i, 1:3)+1, 2)) + y_offset;
-            text(x, y, sprintf("E%i\nAff%i", i-1, elements(i, 7)), "Color", "green");
+            text(x, y, sprintf("E%i\nAff%i", i-1, elements(i, 7)), "Color", "green", "Clipping", "on");
             was_labeled(i) = true;
         end
     end

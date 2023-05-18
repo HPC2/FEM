@@ -24,7 +24,7 @@ for i = 1:size(elements, 1)
         if ~was_labeled(node_id+1)
             x = nodes(node_id+1, 1) + x_offset;
             y = nodes(node_id+1, 2) + y_offset;
-            text(x, y, sprintf(format_str, node_id), "Color", color);
+            text(x, y, sprintf(format_str, node_id), "Color", color, "Clipping", "on");
             was_labeled(node_id+1) = true;
         end
     end

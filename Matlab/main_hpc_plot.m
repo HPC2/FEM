@@ -2,7 +2,7 @@ clear
 close all
 
 
-[nodes, elements, boundaries] = hpc_utils.load_problem("rectangle_3x3");
+[nodes, elements, boundaries] = hpc_utils.load_problem("rectangle_3x3_global_3ref");
 interfaces = hpc_utils.load_interfaces("rectangle_3x3");
 
 figure();
