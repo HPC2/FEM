@@ -1,7 +1,7 @@
 #include "hpc.h"
 #include <stdio.h>
 
-mesh *mesh_create_rect(index n_rows, index n_cols, bool *boundaries) {
+mesh *mesh_create_rect(index n_rows, index n_cols, index *boundaries) {
     index n_nodes_row = n_rows + 1;
     index n_nodes_col = n_cols + 1;
     index n_nodes = n_nodes_row*n_nodes_col;

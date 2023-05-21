@@ -4,6 +4,27 @@
 #include <mpi.h>
 #include "hpc.h"
 
+double kappa( double x[2], index typ )
+{
+  return ( 1.0 );
+}
+
+double F_vol( double x[2], index typ )
+{
+  return ( 0.0 );
+}
+
+double g_Neu( double x[2], index typ )
+{
+  return ( x[0] * x[1] );
+}
+
+double u_D( double x[2])
+{
+//  return ( 0.0 );
+  return ( x[0] * x[1] );
+}
+
 int main(int argc, char **argv) {
     MPI_Init(&argc, &argv);
     int rank; MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -26,13 +47,13 @@ int main(int argc, char **argv) {
     }
 
     MPI_Bcast(&refinements, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    bool boundaries[4] = {0, 0, 0, 0};
+    index global_boundaries[4] = {0, 0, 1, 0};
     index* l2g_numbering;
     interface_data* interfaces;
 
     if (rank == 0) {
         // Global mesh
-        mesh* global_mesh = mesh_create_rect(n_rows, n_cols, boundaries);
+        mesh* global_mesh = mesh_create_rect(n_rows, n_cols, global_boundaries);
         if(!global_mesh) {
             printf("OOM\n");
             return 1;
@@ -69,17 +90,41 @@ int main(int argc, char **argv) {
         mesh_free(global_mesh);
     }
 
+    index* boundaries = mpi_boundaries(n_rows, n_cols, global_boundaries);
+
+    // if (rank == 0) {
+    //     printf("Rank %d boundaries: %td, %td, %td, %td\n", rank, boundaries[0], boundaries[1], boundaries[2], boundaries[3]);
+    // }
+
     mesh* local_mesh = mesh_create_rect(1, 1, boundaries);
     local_mesh = mesh_multi_refine(local_mesh, refinements);
     int n_nodes = (int)local_mesh->ncoord;
 
-    coupling_data* coupling = mpi_split_interfaces(interfaces, l2g_numbering, n_nodes);
-    
+    // get pattern of matrix
+    sed* A = sed_nz_pattern(local_mesh);
+    if (!A) return(1);
 
-    // TODO
-    // speicher freigeben
-    // colors
-    // interfaces in lokalem numbering (und nicht globalem)
+    // Build stiffness matrix
+    if ( !sed_buildS(local_mesh, A) ) return(1); // assemble coefficient matrix
+
+    // Print the matrix
+    if (rank == 0) {
+        sed_print(A, 1);
+    }
+
+    // Get storage for rhs and solution
+    index n    = A->n;
+    // Initialize with zeros
+    double* x    = calloc (n, sizeof(double));       // get workspace for sol
+    double* w    = calloc (n, sizeof(double));       // get temporary workspace
+    double* b    = calloc (n, sizeof(double));       // get workspace for rhs
+    double* resi = calloc (n, sizeof(double));       // get workspace for residual
+
+    // Build rhs (Volume and Neumann data)
+    mesh_buildRhs(local_mesh, b, F_vol, g_Neu); 
+
+    coupling_data* coupling = mpi_split_interfaces(interfaces, l2g_numbering, n_nodes);
+
     
     MPI_Finalize();
 }

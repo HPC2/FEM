@@ -87,6 +87,7 @@ typedef struct coupling_data
 /* utilities */
 void interface_data_write(interface_data *interface_data, char* fname);
 coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int n_nodes);
+index* mpi_boundaries(index n_rows, index n_cols, index* global_boundaries);
 
 void *hpc_realloc (void *p, index n, size_t size, index *ok);
 double hpc_cumsum (index *p, index *c, index n);
@@ -114,7 +115,7 @@ subprocesses.
 @param boundaries 4 x 1 array for boundary condition type in anti-clock wise ordering,
 starting with the lower boundary of the rectangle
 */
-mesh *mesh_create_rect(index n_rows, index n_cols, bool *boundaries);
+mesh *mesh_create_rect(index n_rows, index n_cols, index *boundaries);
 
 /*
 writes a matrix as file "filename.extension"

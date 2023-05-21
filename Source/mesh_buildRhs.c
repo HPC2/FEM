@@ -89,7 +89,7 @@ void mesh_buildRhs(const mesh *M, double *b, double (*fV)(double *, index),
     // Boundary integrals (g, \varphi)_L2(\Gamma_N)
     for ( k = 0 ; k < nB; k++)
     {
-        if (Bdry[4*k+3]) // if neumann
+        if (Bdry[4*k+3] == 1) // if neumann
         {
             // Get edge nodes
             ind[0] = Bdry[4*k+0];

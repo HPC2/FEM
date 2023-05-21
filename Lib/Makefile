@@ -55,6 +55,7 @@ HPC = \
  mesh_refine.o  \
  mesh_getFixed.o  \
  mesh_getNumbering.o \
+ mesh_mpi_boundaries.o \
  mesh_util.o \
  blas_level1.o \
  blas_level2.o \

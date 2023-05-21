@@ -11,6 +11,7 @@ coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int 
     MPI_Type_contiguous(n_nodes, MPI_AINT, &l2g_type);
     MPI_Type_commit(&l2g_type);
     MPI_Scatter(l2g, 1, l2g_type, coupling->l2g, 1, l2g_type, 0, MPI_COMM_WORLD);
+    MPI_Type_free(&l2g_type);
 
     // if (rank == 1) {
     //     printf("Hey I'm process %d and these are my l2g:\n", rank);
