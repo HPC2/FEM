@@ -33,6 +33,7 @@ int main(int argc, char **argv) {
     int n_rows;
     int n_cols;
     int refinements;
+    index n_global_nodes;
 
     if (rank == 0) {
         if (argc != 4) {
@@ -46,7 +47,9 @@ int main(int argc, char **argv) {
         assert(nof_p == n_rows * n_cols);
     }
 
+    // broadcat number of refinements
     MPI_Bcast(&refinements, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
     index global_boundaries[4] = {0, 0, 1, 0};
     index* l2g_numbering;
     interface_data* interfaces;
@@ -66,6 +69,9 @@ int main(int argc, char **argv) {
 
         // Refine
         global_mesh = mesh_multi_refine(global_mesh, refinements);
+
+        // get number of global nodes
+        n_global_nodes = global_mesh->ncoord;
 
         // Save global mesh after refining for debug
         char fname_glob_mesh_post_ref[200];
@@ -89,6 +95,10 @@ int main(int argc, char **argv) {
         // Free relevant stuff in this scope
         mesh_free(global_mesh);
     }
+
+    // broadcast number of global nodes
+    MPI_Bcast(&n_global_nodes, 1, MPI_AINT, 0, MPI_COMM_WORLD);
+
 
     index* boundaries = mpi_boundaries(n_rows, n_cols, global_boundaries);
 
@@ -123,7 +133,7 @@ int main(int argc, char **argv) {
     // Build rhs (Volume and Neumann data)
     mesh_buildRhs(local_mesh, b, F_vol, g_Neu); 
 
-    coupling_data* coupling = mpi_split_interfaces(interfaces, l2g_numbering, n_nodes);
+    coupling_data* coupling = mpi_split_interfaces(interfaces, l2g_numbering, n_nodes, n_global_nodes);
 
     coupling_data_print(coupling, rank);
     

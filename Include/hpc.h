@@ -59,9 +59,29 @@ typedef struct mesh_data  /* mesh */
     index *fixed;     /* bdry ([n1,n2,m1,t1], [n3,n4,m2,t2], ...)          */
 } mesh ;
 
+/*
+creates a rowmajor matrix with each row containing the local to global numbering for each processor
+and return the pointer to this matrix
+@param M The global mesh
+@param rows The number of rows
+@param cols The number of columns
+@param refinements The number of refinements
+*/
 index* get_local_to_global_numbering(mesh* M, const index rows, 
                                               const index cols,
                                               index refinements);
+
+/*
+creates a vector of length n_global_nodes with the global to local numbering for one processor
+If the node exists, g2l[flobal_node_number] return the local node number
+If the node doesn't exist, g2l[global_node_nr] returns -1
+@param local_numbering one row (for one processor) of the local-to-global matrix
+@param nof_local_nodes The number of local nodes
+@param nof_global_nodes The number of global nodes
+*/
+index* get_global_to_local_numbering(index* local_numbering, 
+                                     index  nof_local_nodes,
+                                     index  nof_global_nodes);
                                               
 typedef struct interface_data
 {
@@ -87,7 +107,7 @@ typedef struct coupling_data
 /* utilities */
 void coupling_data_print(coupling_data* coupling, int rank);
 void interface_data_write(interface_data *interface_data, char* fname);
-coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int n_nodes);
+coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int n_nodes, index n_global_nodes);
 index* mpi_boundaries(index n_rows, index n_cols, index* global_boundaries);
 
 void *hpc_realloc (void *p, index n, size_t size, index *ok);

@@ -1,7 +1,7 @@
 #include "hpc.h"
 #include <mpi.h>
 
-coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int n_nodes) {
+coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int n_nodes, index n_global_nodes) {
     int rank; MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     int nof_p; MPI_Comm_size(MPI_COMM_WORLD, &nof_p);
     coupling_data* coupling = malloc(sizeof(coupling_data));
@@ -33,6 +33,10 @@ coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int 
     coupling->coupl = malloc(sizeof(index)*coupling->ncoupl*5);
     coupling->dcoupl = malloc(sizeof(index)*coupling->ncoupl);
     coupling->icoupl = malloc(sizeof(index*)*coupling->ncoupl);
+
+    // get global to local information 
+    index* g2l = get_global_to_local_numbering(coupling->l2g, n_nodes, n_global_nodes);
+
     if (rank == 0) {
         index** interface_ids = interfaces->interface_ids;
         // copy information into local coupling data
@@ -45,7 +49,7 @@ coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int 
                 coupling->coupl[5*j+k] = interfaces->coupl[5*interface_id+k];
             }
             for (int k = 0; k < coupling->dcoupl[j]; k++) {
-                coupling->icoupl[j][k] = interfaces->icoupl[interface_id][k];
+                coupling->icoupl[j][k] = g2l[ interfaces->icoupl[interface_id][k] ]; // local node numbers
             }
         }
         // distribute information to other processes
@@ -58,12 +62,21 @@ coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int 
                     MPI_AINT, i, 0, MPI_COMM_WORLD);
             }
         }
-    } else {
-        for (int j = 0; j < coupling->ncoupl; j++) {
+    } else { // rank != 0 (all other processes)
+        for (int j = 0; j < coupling->ncoupl; j++) { // for each interface j
             MPI_Recv(&coupling->coupl[5*j], 5, MPI_AINT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             MPI_Recv(&coupling->dcoupl[j], 1, MPI_AINT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             coupling->icoupl[j] = malloc(coupling->dcoupl[j]*sizeof(index));
             MPI_Recv(coupling->icoupl[j], coupling->dcoupl[j], MPI_AINT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+            // convert icoupl from global to local node numbers
+            for(int i=0; i<coupling->dcoupl[j]; i++) { // for each node in interface j
+                if(rank == 1) {
+                    printf("interface = %d, node = %d: %td ", j, i, coupling->icoupl[j][i]);
+                    printf("turns to %td\n", g2l[coupling->icoupl[j][i]]);
+                }
+                coupling->icoupl[j][i] = g2l[coupling->icoupl[j][i]];
+            }
         }
     }
     
@@ -84,6 +97,9 @@ coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int 
     //     }
     //     printf("\n");
     // }
+
+    /* free all malloced addresses */
+    free(g2l);
 
     return coupling;
 }
