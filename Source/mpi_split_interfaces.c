@@ -23,8 +23,10 @@ coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int 
 
     // Cross-Points
     coupling->nCrossPts = 4;
-    index cross_pts[4] = {0, 1, 2, 3};
-    coupling->crossPts = cross_pts;
+    coupling->crossPts = malloc(sizeof(index)*coupling->nCrossPts);
+    for (int i = 0; i < coupling->nCrossPts; i++){
+        coupling->crossPts[i] = i;
+    }
     
     // Interfaces
     MPI_Scatter(rank == 0 ? interfaces->interface_counts : 0, 1, MPI_AINT, &coupling->ncoupl, 1, MPI_AINT, 0, MPI_COMM_WORLD);
