@@ -125,6 +125,7 @@ int main(int argc, char **argv) {
 
     coupling_data* coupling = mpi_split_interfaces(interfaces, l2g_numbering, n_nodes);
 
+    coupling_data_print(coupling, rank);
     
     MPI_Finalize();
 }

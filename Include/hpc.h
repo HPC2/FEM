@@ -85,6 +85,7 @@ typedef struct coupling_data
 } coupling_data;
 
 /* utilities */
+void coupling_data_print(coupling_data* coupling, int rank);
 void interface_data_write(interface_data *interface_data, char* fname);
 coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int n_nodes);
 index* mpi_boundaries(index n_rows, index n_cols, index* global_boundaries);
