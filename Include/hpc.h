@@ -115,7 +115,39 @@ void coupling_data_print(coupling_data* coupling, int rank);
 void interface_data_write(interface_data *interface_data, char* fname);
 coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int n_nodes, index n_global_nodes);
 index* mpi_boundaries(index n_rows, index n_cols, index* global_boundaries);
+
+/*
+sums up all node-values of the crosspoints by communicating with everyone
+@param coupling A pointer to the coupling_data struct
+@param x A pointer to the vector containing all local node values for that processor
+@param cp_buffer A buffer for sending the node values and receiving the summed up node values. 
+It has size (m+1)(n+1) as the crosspoint nodes have the lowest node numbers
+*/
 void mpi_sum_crosspoints(coupling_data* coupling, double* x, double* cp_buffer);
+
+/*
+sums up all node-values of the interfaces by communicating with all 4 neighbors
+@param coupling A pointer to the coupling_data struct
+@param x A pointer to the vector containing all local node values for that processor
+@parma if_buffer_send A buffer for sending the interface node values
+@param if_buffer_recv A buffer for receiving the interface node values
+*/
+void mpi_sum_interfaces(coupling_data* coupling, double* x, double* if_buffer_send, double* if_buffer_recv);
+
+/*
+converts a type2 vector into a type1 vector by communicating all crosspoint values and interface values
+@param coupling A pointer to the coupling_data struct
+@param x A pointer to the vector containing all local node values for that processor
+@param cp_buffer A buffer for sending the node values and receiving the summed up node values. 
+It has size (m+1)(n+1) as the crosspoint nodes have the lowest node numbers
+@parma if_buffer_send A buffer for sending the interface node values
+@param if_buffer_recv A buffer for receiving the interface node values
+*/
+void mpi_convert_type2_to_type1(coupling_data* coupling, double* x, double* cp_buffer, double* if_buffer_send, double* if_buffer_recv) {
+    mpi_sum_crosspoints(coupling, x, cp_buffer); 
+    mpi_sum_interfaces(coupling, x, if_buffer_send, if_buffer_recv);
+}
+
 double mpi_dotprod(index n, double* x, double* y);
 
 void *hpc_realloc (void *p, index n, size_t size, index *ok);
