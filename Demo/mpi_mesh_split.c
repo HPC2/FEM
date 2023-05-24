@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
 
     // Print the matrix
     if (rank == 0) {
-        sed_print(A, 1);
+        // sed_print(A, 1);
     }
 
     // Get storage for rhs and solution
@@ -144,6 +144,7 @@ int main(int argc, char **argv) {
     MPI_Bcast(&n_global_crosspoints, 1, MPI_INT, 0, MPI_COMM_WORLD);
     coupling->n_global_cp = n_global_crosspoints;
 
-    mesh_free(global_mesh);
+    if (rank == 0)
+        mesh_free(global_mesh);
     MPI_Finalize();
 }

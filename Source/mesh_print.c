@@ -126,7 +126,7 @@ void mesh_write(mesh *M, char* fname) {
 
     f = fopen(elems_fname, "w");
     for(int i = 0; i < n_elems; i++) {
-        fprintf(f, "%zu\t%zu\t%zu\t%zu\t%zu\t%zu\t%zu\n", 
+        fprintf(f, "%td\t%td\t%td\t%td\t%td\t%td\t%td\n", 
             elems[7*i+0], 
             elems[7*i+1], 
             elems[7*i+2], 
@@ -139,7 +139,7 @@ void mesh_write(mesh *M, char* fname) {
 
     f = fopen(bds_fname, "w");
     for(int i = 0; i < n_bdry; i++) {
-        fprintf(f, "%zu\t%zu\t%zu\t%zu\n", 
+        fprintf(f, "%td\t%td\t%td\t%td\n", 
             bdry[4*i+0], 
             bdry[4*i+1], 
             bdry[4*i+2], 

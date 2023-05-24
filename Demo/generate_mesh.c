@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
 
     char pdir[] = "../Problem/";
 
-    bool boundaries[4] = {0, 0, 0, 0};
+    index boundaries[4] = {0, 0, 0, 0};
     mesh* Mesh = mesh_create_rect(n_rows, n_cols, boundaries);
     if(!Mesh) {
         printf("OOM\n");
@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
                     &Mesh->edge2no);
     
     // refine the mesh
-    int refinements = 1;
+    int refinements = 3;
     for(int i=0; i<refinements; i++) {
         Mesh = mesh_refine(Mesh);
         // update edge/node info??

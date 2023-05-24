@@ -39,6 +39,24 @@ void coupling_data_print(coupling_data* coupling, int rank){
             );
     }
     offset += sprintf(buf+offset,"]\n");
+
+    // Print dcoupl
+    offset += sprintf(buf+offset,"\tdcoupl\t\t= [");
+    for (index i=0; i<ncoupl; i++){
+            offset += sprintf(buf+offset, "%td, ", dcoupl[i]);
+    }
+    offset += sprintf(buf+offset,"]\n");
+
+    // Print icoupl
+    offset += sprintf(buf+offset,"\ticoupl\t\t= [");
+    for (index i = 0; i < ncoupl; i++) {
+        offset += sprintf(buf+offset,"[");
+        for (index j = 0; j < dcoupl[i]; j++) {
+            offset += sprintf(buf+offset,"%td, ", icoupl[i][j]);
+        }
+        offset += sprintf(buf+offset,"], ");
+    }
+    offset += sprintf(buf+offset,"]\n");
     
     printf("%s",buf);
 }
