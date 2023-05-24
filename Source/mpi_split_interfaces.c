@@ -81,6 +81,10 @@ coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int 
         }
     }
     
+    // Build coupl_sorted and icoupl_sorted
+    sort_coupl(coupling);
+    sort_icoupl(coupling);
+    
     // if (rank == 0) {
     //     printf("Hey I'm process %d and this is my coupling data:\n", rank);
     //     printf("number interfaces: %zu\n", coupling->ncoupl);

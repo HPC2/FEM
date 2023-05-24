@@ -102,8 +102,10 @@ typedef struct coupling_data
       index* l2g; /* local to global node numbering */
       index ncoupl ; /* local number of coupling interfaces */
       index *coupl ; /* local coupling interfaces ([a1,e1,l1,r1,c1], ... ) */
+      index *coupl_sorted; // Sorted coupl by color. Allways length 4. If color does not exits: [0,0,0,0,-1]
       index *dcoupl ; /* number of nodes on interfaces (no crosspoints) */
       index **icoupl ; /* vector of nodenumbers on interfaces (no crosspts) */
+      index **icoupl_sorted ; // Same as concept as coupl_sorted
 } coupling_data;
 
 
@@ -113,6 +115,8 @@ double* mpi_assemble_t2_vec(coupling_data* coupling, double* local_x, index n);
 
 
 /* utilities */
+void sort_coupl(coupling_data* coupling);
+void sort_icoupl(coupling_data* coupling);
 void coupling_data_print(coupling_data* coupling, int rank);
 void interface_data_write(interface_data *interface_data, char* fname);
 coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int n_nodes, index n_global_nodes);
