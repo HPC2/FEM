@@ -67,6 +67,7 @@ int main(int argc, char **argv) {
             return 1;
         }
 
+        // get number of global crosspoints (which is the number of nodes before refining)
         n_global_crosspoints = global_mesh->ncoord;
 
         // Save global mesh before refining for debug
@@ -149,8 +150,10 @@ int main(int argc, char **argv) {
     coupling->n_global_cp = n_global_crosspoints;
 
     double* global_b = mpi_assemble_t2_vec(coupling, b, n_nodes); // warning: global_b only contains smth sensible for rank 0
+    double* global_A = mpi_assemble_A(A, coupling);
     if (rank == 0) {
       print_dmatrix(global_b, n_global_nodes, 1, false, "../Problem/rhs-test", "dat");
+      print_dmatrix(global_A, n_global_nodes, n_global_nodes, true, "../Problem/A-test", "dat");
       // printf("global rhs:\n");
       // for (index i = 0; i < n_global_nodes; i++) {
       //   printf("%4.4lf\n", global_b[i]);

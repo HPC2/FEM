@@ -75,8 +75,9 @@ int main(int argc, char **argv) {
     // Build rhs (Volume and Neumann data)
     mesh_buildRhs(Mesh, b, F_vol, g_Neu); 
 
-
+    gem* A_full = sed_to_dense(A, true);
     print_dmatrix(b, n, 1, false, "../Problem/rhs", "dat");
+    print_dmatrix(A_full->x, n, n, true, "../Problem/A", "dat");
     // printf("global rhs:\n");
     // for (index i = 0; i < Mesh->ncoord; i++) {
     //   printf("%4.4lf\n", b[i]);

@@ -110,7 +110,7 @@ typedef struct coupling_data
 
 
 double dot_parallel(double* v_i, double* w_i, index n);
-double* mpi_assemble_A (sed* A_loc, coupling_data* coupling, index n);
+double* mpi_assemble_A (sed* A_loc, coupling_data* coupling);
 double* mpi_assemble_t2_vec(coupling_data* coupling, double* local_x, index n);
 
 
@@ -149,10 +149,7 @@ It has size (m+1)(n+1) as the crosspoint nodes have the lowest node numbers
 @parma if_buffer_send A buffer for sending the interface node values
 @param if_buffer_recv A buffer for receiving the interface node values
 */
-void mpi_convert_type2_to_type1(coupling_data* coupling, double* x, double* cp_buffer, double* if_buffer_send, double* if_buffer_recv) {
-    mpi_sum_crosspoints(coupling, x, cp_buffer); 
-    mpi_sum_interfaces(coupling, x, if_buffer_send, if_buffer_recv);
-}
+void mpi_convert_type2_to_type1(coupling_data* coupling, double* x, double* cp_buffer, double* if_buffer_send, double* if_buffer_recv);
 
 double mpi_dotprod(index n, double* x, double* y);
 

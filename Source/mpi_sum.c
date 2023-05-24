@@ -43,7 +43,7 @@ void mpi_sum_interfaces(coupling_data* coupling, double* x, double* if_buffer_se
         }
 
         if(color > -1) {
-            for (index j = 0; j < n_cp; j++) {
+            for (index j = 0; j < n_nodes_interface; j++) {
                 x[if_nodes[j]] += if_buffer_recv[j]; // accumulating
             }
         }
