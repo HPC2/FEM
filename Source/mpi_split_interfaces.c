@@ -22,9 +22,9 @@ coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int 
     // }
 
     // Cross-Points
-    coupling->nCrossPts = 4;
-    coupling->crossPts = malloc(sizeof(index)*coupling->nCrossPts);
-    for (int i = 0; i < coupling->nCrossPts; i++){
+    coupling->n_local_cp = 4;
+    coupling->crossPts = malloc(sizeof(index)*coupling->n_local_cp);
+    for (int i = 0; i < coupling->n_local_cp; i++){
         coupling->crossPts[i] = i;
     }
     

@@ -34,6 +34,7 @@ int main(int argc, char **argv) {
     int n_cols;
     int refinements;
     index n_global_nodes;
+    int n_global_crosspoints;
 
     if (rank == 0) {
         if (argc != 4) {
@@ -53,14 +54,18 @@ int main(int argc, char **argv) {
     index global_boundaries[4] = {0, 0, 1, 0};
     index* l2g_numbering;
     interface_data* interfaces;
+    mesh* global_mesh;
 
     if (rank == 0) {
         // Global mesh
-        mesh* global_mesh = mesh_create_rect(n_rows, n_cols, global_boundaries);
+        global_mesh = mesh_create_rect(n_rows, n_cols, global_boundaries);
+        
         if(!global_mesh) {
             printf("OOM\n");
             return 1;
         }
+
+        n_global_crosspoints = global_mesh->ncoord;
 
         // Save global mesh before refining for debug
         char fname_glob_mesh_pre_ref[200];
@@ -91,9 +96,6 @@ int main(int argc, char **argv) {
         char fname_interfaces[200];
         sprintf(fname_interfaces,"../Problem/rectangle_%dx%d",n_rows,n_cols);
         interface_data_write(interfaces, fname_interfaces);
-
-        // Free relevant stuff in this scope
-        mesh_free(global_mesh);
     }
 
     // broadcast number of global nodes
@@ -129,6 +131,8 @@ int main(int argc, char **argv) {
     double* w    = calloc (n, sizeof(double));       // get temporary workspace
     double* b    = calloc (n, sizeof(double));       // get workspace for rhs
     double* resi = calloc (n, sizeof(double));       // get workspace for residual
+    double* cp_buffer 
+                = calloc(n_global_crosspoints, sizeof(double)); // get workspace for crosspoints buffer
 
     // Build rhs (Volume and Neumann data)
     mesh_buildRhs(local_mesh, b, F_vol, g_Neu); 
@@ -137,5 +141,9 @@ int main(int argc, char **argv) {
 
     coupling_data_print(coupling, rank);
     
+    MPI_Bcast(&n_global_crosspoints, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    coupling->n_global_cp = n_global_crosspoints;
+
+    mesh_free(global_mesh);
     MPI_Finalize();
 }

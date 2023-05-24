@@ -1,7 +1,7 @@
 #include "hpc.h"
 
 void coupling_data_print(coupling_data* coupling, int rank){
-    index   nCrossPts = coupling->nCrossPts;
+    index   nCrossPts = coupling->n_local_cp;
     index*  crossPts  = coupling->crossPts;
     index*  l2g       = coupling->l2g;
     index   ncoupl    = coupling->ncoupl;

@@ -95,7 +95,8 @@ typedef struct interface_data
 
 typedef struct coupling_data
 {
-      index nCrossPts; /* number of all CrossPoints */
+      index n_global_cp; // number of global crosspoints
+      index n_local_cp; // number of local crosspoints
       index* crossPts; /* crosspoints */
       index* l2g; /* local to global node numbering */
       index ncoupl ; /* local number of coupling interfaces */
@@ -109,6 +110,8 @@ void coupling_data_print(coupling_data* coupling, int rank);
 void interface_data_write(interface_data *interface_data, char* fname);
 coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int n_nodes, index n_global_nodes);
 index* mpi_boundaries(index n_rows, index n_cols, index* global_boundaries);
+void mpi_sum_crosspoints(coupling_data* coupling, double* x, double* cp_buffer);
+double mpi_dotprod(index n, double* x, double* y);
 
 void *hpc_realloc (void *p, index n, size_t size, index *ok);
 double hpc_cumsum (index *p, index *c, index n);
