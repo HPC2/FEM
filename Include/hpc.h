@@ -105,6 +105,11 @@ typedef struct coupling_data
       index **icoupl ; /* vector of nodenumbers on interfaces (no crosspts) */
 } coupling_data;
 
+
+double dot_parallel(double* v_i, double* w_i, index n);
+
+
+
 /* utilities */
 void coupling_data_print(coupling_data* coupling, int rank);
 void interface_data_write(interface_data *interface_data, char* fname);
