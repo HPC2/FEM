@@ -65,7 +65,7 @@ HPC = \
  mpi_sum.o \
  matrix_print.o \
  numbering_write_l2g.o\
- dot_parallel.o
+ mpi_dot.o
 
 
 $(HPC): ../Include/hpc.h Makefile
