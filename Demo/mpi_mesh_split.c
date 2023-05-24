@@ -49,16 +49,18 @@ int main(int argc, char **argv) {
     }
 
     // broadcat number of refinements
+    MPI_Bcast(&n_rows, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&n_cols, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&refinements, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-    index global_boundaries[4] = {0, 0, 1, 0};
+    index global_boundaries[4] = {1, 1, 1, 1};
     index* l2g_numbering;
     interface_data* interfaces;
     mesh* global_mesh;
 
     if (rank == 0) {
         // Global mesh
-        global_mesh = mesh_create_rect(n_rows, n_cols, global_boundaries);
+        global_mesh = mesh_create_rect(n_rows, n_cols, global_boundaries, 0.0, 0.0);
         
         if(!global_mesh) {
             printf("OOM\n");
@@ -98,17 +100,16 @@ int main(int argc, char **argv) {
         interface_data_write(interfaces, fname_interfaces);
     }
 
-    // broadcast number of global nodes
-    MPI_Bcast(&n_global_nodes, 1, MPI_AINT, 0, MPI_COMM_WORLD);
-
 
     index* boundaries = mpi_boundaries(n_rows, n_cols, global_boundaries);
 
     // if (rank == 0) {
     //     printf("Rank %d boundaries: %td, %td, %td, %td\n", rank, boundaries[0], boundaries[1], boundaries[2], boundaries[3]);
     // }
+    double offset_x = rank % n_cols;
+    double offset_y = rank / n_cols;
 
-    mesh* local_mesh = mesh_create_rect(1, 1, boundaries);
+    mesh* local_mesh = mesh_create_rect(1, 1, boundaries, offset_x, offset_y);
     local_mesh = mesh_multi_refine(local_mesh, refinements);
     int n_nodes = (int)local_mesh->ncoord;
 
@@ -137,14 +138,28 @@ int main(int argc, char **argv) {
     // Build rhs (Volume and Neumann data)
     mesh_buildRhs(local_mesh, b, F_vol, g_Neu); 
 
+    // broadcast number of global nodes
+    MPI_Bcast(&n_global_nodes, 1, MPI_AINT, 0, MPI_COMM_WORLD);
+    // create coupling data
     coupling_data* coupling = mpi_split_interfaces(interfaces, l2g_numbering, n_nodes, n_global_nodes);
 
-    coupling_data_print(coupling, rank);
+    // coupling_data_print(coupling, rank);
     
     MPI_Bcast(&n_global_crosspoints, 1, MPI_INT, 0, MPI_COMM_WORLD);
     coupling->n_global_cp = n_global_crosspoints;
 
-    if (rank == 0)
+    double* global_b = mpi_assemble_t2_vec(coupling, b, n_nodes); // warning: global_b only contains smth sensible for rank 0
+    if (rank == 0) {
+      print_dmatrix(global_b, n_global_nodes, 1, false, "../Problem/rhs-test", "dat");
+      // printf("global rhs:\n");
+      // for (index i = 0; i < n_global_nodes; i++) {
+      //   printf("%4.4lf\n", global_b[i]);
+      // }
+    }
+
+    if (rank == 0) {
         mesh_free(global_mesh);
+        free(global_b);
+    }
     MPI_Finalize();
 }

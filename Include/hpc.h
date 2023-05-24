@@ -95,6 +95,7 @@ typedef struct interface_data
 
 typedef struct coupling_data
 {
+      index n_global_nodes;
       index n_global_cp; // number of global crosspoints
       index n_local_cp; // number of local crosspoints
       index* crossPts; /* crosspoints */
@@ -108,6 +109,7 @@ typedef struct coupling_data
 
 double dot_parallel(double* v_i, double* w_i, index n);
 double* mpi_assemble_A (sed* A_loc, coupling_data* coupling, index n);
+double* mpi_assemble_t2_vec(coupling_data* coupling, double* local_x, index n);
 
 
 /* utilities */
@@ -176,7 +178,7 @@ subprocesses.
 @param boundaries 4 x 1 array for boundary condition type in anti-clock wise ordering,
 starting with the lower boundary of the rectangle
 */
-mesh *mesh_create_rect(index n_rows, index n_cols, index *boundaries);
+mesh *mesh_create_rect(index n_rows, index n_cols, index *boundaries, double offset_x, double offset_y);
 
 /*
 writes a matrix as file "filename.extension"
@@ -187,7 +189,8 @@ writes a matrix as file "filename.extension"
 @param name Name of the file
 @param extension File extension of the file
 */
-void print_matrix(index* A, index rows, index cols, bool rowmajor, char* name, char* extension);
+void print_imatrix(index* A, index rows, index cols, bool rowmajor, char* name, char* extension);
+void print_dmatrix(double* A, index rows, index cols, bool rowmajor, char* name, char* extension);
 
 /*
 writes the local to global numbering matrix

@@ -6,6 +6,7 @@ coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int 
     int nof_p; MPI_Comm_size(MPI_COMM_WORLD, &nof_p);
     coupling_data* coupling = malloc(sizeof(coupling_data));
 
+    coupling->n_global_nodes = n_global_nodes;
     coupling->l2g = malloc(sizeof(index)*n_nodes);
     MPI_Datatype l2g_type;
     MPI_Type_contiguous(n_nodes, MPI_AINT, &l2g_type);
