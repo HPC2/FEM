@@ -1,18 +1,6 @@
 #include "hpc.h"
 #include <mpi.h>
 
-
-/*
-double* dot (double* v_i, double* w_i, index n, double* ddot_res){
-    ddot_res[0] = 0;
-    for(int i=0; i<n; i++){
-        ddot_res[0] += v_i[i] + w_i[i]; 
-    }
-    return ddot_res;
-}
-*/
-
-
 double dot_parallel(double* v_i, double* w_i, index n) {
     // Input:  v_i & w_i (accumulated vectors)
     // Output: Inner product (send a scalar to all prozessors)    
