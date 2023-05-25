@@ -18,15 +18,14 @@ void mpi_sum_interfaces(coupling_data* coupling, double* x, double* if_buffer_se
     int rank; MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     for(int i=0; i<4; i++) { // iterate through all 4 colors
-        index left  = coupling->coupl[5*i+2];
-        index right = coupling->coupl[5*i+3];
-        index color = coupling->coupl[5*i+4];
-        index* if_nodes = coupling->icoupl[i]; // if non-exitent, this is NULL
+        index left  = coupling->coupl_sorted[5*i+2];
+        index right = coupling->coupl_sorted[5*i+3];
+        index color = coupling->coupl_sorted[5*i+4];
+        index* if_nodes = coupling->icoupl_sorted[i]; // if non-exitent, this is NULL
         index n_nodes_interface = coupling->dcoupl[i];
-        if(color == -1) {
-            left  = MPI_PROC_NULL;
-            right = MPI_PROC_NULL;
-        }
+
+        // debugging
+        printf("I am process %d and my left/right/color are %td/%td/%td\n", rank, left, right, color);
         
         if(color > -1) {
             for (index j = 0; j < n_nodes_interface; j++) {
@@ -35,11 +34,11 @@ void mpi_sum_interfaces(coupling_data* coupling, double* x, double* if_buffer_se
         }
 
         if(rank == left) { // I am left and communicate with right
-            MPI_Send(if_buffer_send, n_nodes_interface, MPI_DOUBLE, right, 0, MPI_COMM_WORLD);
-            MPI_Recv(if_buffer_recv, n_nodes_interface, MPI_DOUBLE, right, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Send(if_buffer_send, n_nodes_interface, MPI_DOUBLE, color==-1? MPI_PROC_NULL : right, 0, MPI_COMM_WORLD);
+            MPI_Recv(if_buffer_recv, n_nodes_interface, MPI_DOUBLE, color==-1? MPI_PROC_NULL : right, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         }else{             // I am right and communicate with left
-            MPI_Recv(if_buffer_recv, n_nodes_interface, MPI_DOUBLE, left, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            MPI_Send(if_buffer_send, n_nodes_interface, MPI_DOUBLE, left, 0, MPI_COMM_WORLD);
+            MPI_Recv(if_buffer_recv, n_nodes_interface, MPI_DOUBLE, color==-1? MPI_PROC_NULL : left, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Send(if_buffer_send, n_nodes_interface, MPI_DOUBLE, color==-1? MPI_PROC_NULL : left, 0, MPI_COMM_WORLD);
         }
 
         if(color > -1) {
