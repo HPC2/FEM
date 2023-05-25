@@ -112,6 +112,7 @@ typedef struct coupling_data
 double dot_parallel(double* v_i, double* w_i, index n);
 double* mpi_assemble_A (sed* A_loc, coupling_data* coupling);
 double* mpi_assemble_t2_vec(coupling_data* coupling, double* local_x, index n);
+double* mpi_assemble_t1_vec(coupling_data* coupling, double* local_x, index n);
 
 
 /* utilities */

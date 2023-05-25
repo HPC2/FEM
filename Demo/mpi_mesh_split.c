@@ -133,8 +133,6 @@ int main(int argc, char **argv) {
     double* w    = calloc (n, sizeof(double));       // get temporary workspace
     double* b    = calloc (n, sizeof(double));       // get workspace for rhs
     double* resi = calloc (n, sizeof(double));       // get workspace for residual
-    double* cp_buffer 
-                = calloc(n_global_crosspoints, sizeof(double)); // get workspace for crosspoints buffer
 
     // Build rhs (Volume and Neumann data)
     mesh_buildRhs(local_mesh, b, F_vol, g_Neu); 
@@ -148,11 +146,18 @@ int main(int argc, char **argv) {
     
     MPI_Bcast(&n_global_crosspoints, 1, MPI_INT, 0, MPI_COMM_WORLD);
     coupling->n_global_cp = n_global_crosspoints;
+    double* cp_buffer = calloc(n_global_crosspoints, sizeof(double));
+    double* if_buffer1 = calloc(4, sizeof(double));
+    double* if_buffer2 = calloc(4, sizeof(double));
 
-    double* global_b = mpi_assemble_t2_vec(coupling, b, n_nodes); // warning: global_b only contains smth sensible for rank 0
+    double* global_b2 = mpi_assemble_t2_vec(coupling, b, n_nodes); // warning: global_b only contains smth sensible for rank 0
     double* global_A = mpi_assemble_A(A, coupling);
+    mpi_convert_type2_to_type1(coupling, b, cp_buffer, if_buffer1, if_buffer2);
+    // double* global_b1 = mpi_assemble_t1_vec(coupling, b, n_nodes);
+
     if (rank == 0) {
-      print_dmatrix(global_b, n_global_nodes, 1, false, "../Problem/rhs-test", "dat");
+      print_dmatrix(global_b2, n_global_nodes, 1, false, "../Problem/rhs-test2", "dat");
+      // print_dmatrix(global_b1, n_global_nodes, 1, false, "../Problem/rhs-test1", "dat");
       print_dmatrix(global_A, n_global_nodes, n_global_nodes, true, "../Problem/A-test", "dat");
       // printf("global rhs:\n");
       // for (index i = 0; i < n_global_nodes; i++) {
@@ -162,7 +167,8 @@ int main(int argc, char **argv) {
 
     if (rank == 0) {
         mesh_free(global_mesh);
-        free(global_b);
+        // free(global_b1);
+        free(global_b2);
     }
     MPI_Finalize();
 }
