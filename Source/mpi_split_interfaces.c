@@ -73,8 +73,8 @@ coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int 
             // convert icoupl from global to local node numbers
             for(int i=0; i<coupling->dcoupl[j]; i++) { // for each node in interface j
                 if(rank == 1) {
-                    printf("interface = %d, node = %d: %td ", j, i, coupling->icoupl[j][i]);
-                    printf("turns to %td\n", g2l[coupling->icoupl[j][i]]);
+                    // printf("interface = %d, node = %d: %td ", j, i, coupling->icoupl[j][i]);
+                    // printf("turns to %td\n", g2l[coupling->icoupl[j][i]]);
                 }
                 coupling->icoupl[j][i] = g2l[coupling->icoupl[j][i]];
             }

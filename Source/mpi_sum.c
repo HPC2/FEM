@@ -22,10 +22,10 @@ void mpi_sum_interfaces(coupling_data* coupling, double* x, double* if_buffer_se
         index right = coupling->coupl_sorted[5*i+3];
         index color = coupling->coupl_sorted[5*i+4];
         index* if_nodes = coupling->icoupl_sorted[i]; // if non-exitent, this is NULL
-        index n_nodes_interface = coupling->dcoupl[i];
+        index n_nodes_interface = coupling->dcoupl[0];
 
         // debugging
-        printf("I am process %d and my left/right/color are %td/%td/%td\n", rank, left, right, color);
+        // printf("I am process %d and my left/right/color are %td/%td/%td\n", rank, left, right, color);
         
         if(color > -1) {
             for (index j = 0; j < n_nodes_interface; j++) {
@@ -61,4 +61,15 @@ double mpi_dotprod(index n, double* x, double* y) {
     }
     MPI_Allreduce(MPI_IN_PLACE, &dotprod, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
     return dotprod;
+}
+
+double* accumulate_inv_diag(coupling_data* coupling, sed* A, double* cp_buffer, double* if_buffer_send, double* if_buffer_recv) {
+    index n = A->n;
+    double* x = A->x;
+    double* d = malloc(sizeof(double) * n);
+    for (index i = 0; i < n; i++) {
+        d[i] = x[i];
+    }
+    mpi_convert_type2_to_type1(coupling, d, cp_buffer, if_buffer_send, if_buffer_recv);
+    return d;
 }
