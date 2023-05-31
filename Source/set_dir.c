@@ -23,7 +23,7 @@ void set_dir(const mesh *M, double *u ){
 
 }
 
-void set_dir_u_D(const mesh *M, double *u , const double* u_D ){
+void set_dir_u_D(const mesh *M, double *u , const double u_D ){
     
     index j, k, *Bdry, nB, ind[2];
     

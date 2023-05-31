@@ -57,9 +57,10 @@ int main(int argc, char **argv) {
                     &Mesh->edge2no);
     }
 
-    // mesh_print(Mesh, 0);
-    // char fname[64]; sprintf(fname, "%srectangle_%dx%d_refined%dtimes", pdir, n_rows, n_cols, refinements);
-    // mesh_write(Mesh, fname);
+    Mesh->fixed = mesh_getFixed( Mesh->ncoord, 
+                                 Mesh->bdry, 
+                                 Mesh->nbdry, 
+                                &Mesh->nfixed);
 
     // get pattern of matrix
     sed* A = sed_nz_pattern(Mesh);
@@ -75,13 +76,6 @@ int main(int argc, char **argv) {
     // Build rhs (Volume and Neumann data)
     mesh_buildRhs(Mesh, b, F_vol, g_Neu); 
 
-    gem* A_full = sed_to_dense(A, true);
-    print_dmatrix(b, n, 1, false, "../Problem/rhs", "dat");
-    // print_dmatrix(A_full->x, n, n, true, "../Problem/A", "dat");
-    // printf("global rhs:\n");
-    // for (index i = 0; i < Mesh->ncoord; i++) {
-    //   printf("%4.4lf\n", b[i]);
-    // }
 
     mesh_free(Mesh);
 }
