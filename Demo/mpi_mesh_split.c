@@ -168,12 +168,19 @@ int main(int argc, char **argv) {
         print_dmatrix(global_x, n_global_nodes, 1, false, "../Problem/x-test", "dat");
         print_dmatrix(global_rhs, n_global_nodes, 1, false, "../Problem/b-test", "dat");
     }
-
+    double* global_b = mpi_assemble_t2_vec(coupling, b, n);
+    if (rank == 0) {
+        print_dmatrix(global_b, n_global_nodes, 1, false, "../Problem/b-test1", "dat");
+    }
+    
+    // free some stuff
     mesh_free(local_mesh);
     if (rank == 0) mesh_free(global_mesh);
     free(x);
     free(b); 
     free_comm_buffers(buffers);
+
+    // stop MPI and return
     MPI_Finalize();
     return 0;
 }
