@@ -119,7 +119,65 @@ int main(int argc, char **argv) {
         sed_gs_constr(A, b, x, w, fixed, nfixed, 0); 
     }
 
-    print_dmatrix(x, n, 1, false, "../Problem/x", "dat");
+    print_dmatrix(x, n, 1, false, "../Problem/x_GaussSeidel", "dat");
+
+
+    // Jacobi sequetiell
+    //----------------------------------//
+    // choose tol
+    double tol = 1e-5;
+    // x0 = 0
+    for(int i=0; i<n; i++){
+        x[i] = 0;
+    }
+    //----------------------------------//
+    // resi <-- b
+    dcopy(A->n, b, 1, resi, 1);
+    // resi <-- b(aka resi) - A*x
+    sysed_spmv(-1, A, x, 1, 1, resi, 1);
+    // set fixed nodes to zero
+    for ( size_t i = 0; i < nfixed; ++i){
+        resi[fixed[i]] = 0;
+    }
+    // d = diag(D)^-1
+    double* d = malloc((n)*sizeof(double));
+    for(int i=0; i<n; i++){
+        d[i] = 1/A->x[i]; 
+    }
+    // w <- resi
+    dcopy(n, resi,1, w,1);
+    // w <- d.*resi(aka w)
+    dmult(n, d,1, w,1);
+    // sigma <- w'*resi
+    double sigma0 = ddot(n, w,1, resi,1);
+    double sigma = sigma0;
+    int k = 0;
+    while(sigma > pow(tol,2)*sigma0){
+        k = k+1;
+        // x <- x + omega*w
+        daxpy(n, omega,w,1, x,1);
+        // enforce x(fixed) = b(fixed)
+        for(int i=0; i<nfixed; i++){
+            x[fixed[i]] = b[fixed[i]];
+        }
+        // resi <-- b
+        dcopy(A->n, b, 1, resi, 1);
+        // resi <-- b(aka resi) - A*x
+        sysed_spmv(-1,A, x,1, 1, resi,1);
+        // set fixed nodes to zero
+        for ( size_t i = 0; i < nfixed; ++i){
+            resi[fixed[i]] = 0;
+        }
+        // w <- resi
+        dcopy(n, resi,1, w,1);
+        // w <- d.*resi(aka w)
+        dmult(n, d,1, w,1);
+        // sigma <- w'*resi
+        sigma = ddot(n, w,1, resi,1);
+    }
+    
+    print_dmatrix(x, n, 1, false, "../Problem/x_Jacobi", "dat");
+    
     print_dmatrix(b, n, 1, false, "../Problem/b", "dat"); 
     gem* A_full = sed_to_dense(A, true);
     double* A_data = A_full->x;
