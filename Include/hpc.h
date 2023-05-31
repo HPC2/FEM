@@ -218,6 +218,7 @@ Writes mesh to .co .el .bd files
 */
 void mesh_write(mesh *Mesh, char* fname);
 comm_buffers* alloc_comm_buffers(index n_global_cp, coupling_data* coupling);
+void free_comm_buffers(comm_buffers* buffers);
 interface_data* rect_interface_data(mesh* Mesh, index n_rows, index n_cols, index n_refinments);
 mesh *mesh_alloc (index ncoord, index nelem, index nbdry);
 mesh *mesh_free (mesh *M);
