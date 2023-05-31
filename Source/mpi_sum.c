@@ -3,9 +3,10 @@
 
 void mpi_sum_crosspoints(coupling_data* coupling, double* x, double* cp_buffer) {
     index n_cp = coupling -> n_local_cp;
+    index n_g_cp = coupling->n_global_cp;
     index* cp = coupling -> crossPts;
     index* l2g = coupling -> l2g;
-    for (index i = 0; i < n_cp; i++) {
+    for (index i = 0; i < n_g_cp; i++) {
         cp_buffer[i] = 0;
     }
     for (index i = 0; i < n_cp; i++) {
@@ -26,6 +27,13 @@ void mpi_sum_interfaces(coupling_data* coupling, double* x, double* if_buffer_se
         index color = coupling->coupl_sorted[5*i+4];
         index* if_nodes = coupling->icoupl_sorted[i]; // if non-exitent, this is NULL
         index n_nodes_interface = coupling->dcoupl[0];
+
+        // for (index i = 0; i < n_nodes_interface; i++) {
+        //     if_buffer_send[i] = 0;
+        // }
+        // for (index i = 0; i < n_nodes_interface; i++) {
+        //     if_buffer_recv[i] = 0;
+        // }
 
         // debugging
         // printf("I am process %d and my left/right/color are %td/%td/%td\n", rank, left, right, color);

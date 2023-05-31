@@ -1,6 +1,9 @@
 #include "hpc.h"
+// #include <mpi.h>
 
 void mpi_jacobi(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b) {
+    // int rank; MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    // int nof_p; MPI_Comm_size(MPI_COMM_WORLD, &nof_p);
     index n = A->n;
     index* fixed = local_mesh->fixed;
     index nfixed = local_mesh->nfixed;
@@ -17,7 +20,23 @@ void mpi_jacobi(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* lo
           resi[fixed[i]] = 0;
     }
     dcopy(n, resi, 1, w, 1); // w <- resi
+    // if (rank == 1) {
+    //     for (int i = 0; i < n; i++) {
+    //         printf("%d\t", coupling->l2g[i]);
+    //     }
+    //     printf("\n");
+    //     for (int i = 0; i < n; i++) {
+    //         printf("%1.2lf\t", w[i]);
+    //     }
+    //     printf("\n");
+    // }
     mpi_convert_type2_to_type1(coupling, w, buffers);  // convert w
+    // if (rank == 1) {
+    //     for (int i = 0; i < n; i++) {
+    //         printf("%1.2lf\t", w[i]);
+    //     }
+    //     printf("\n");
+    // }
     dmult(n, inv_diag, 1, w, 1); // w <- D^-1 * w
     double sigma = mpi_dotprod(n, w, resi);
     double sigma0 = sigma;
