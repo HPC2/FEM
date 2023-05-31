@@ -163,7 +163,7 @@ int main(int argc, char **argv) {
 
     // save x
     double* global_x = mpi_assemble_t1_vec(coupling, x, n);
-    if (rank = 0) {
+    if (rank == 0) {
         print_dmatrix(global_x, n_global_nodes, 1, false, "../Problem/x-test1", "dat");
     }
 
