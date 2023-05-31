@@ -43,7 +43,7 @@ double* mpi_assemble_A (sed* A_loc, coupling_data* coupling){
     index* l2g = coupling->l2g;
     index n_loc = A_loc->n;
     index n_glob = coupling->n_global_nodes;
-    double* A_global = calloc(n_glob*n_glob, sizeof(double));
+    double* A_global = calloc(n_glob*n_glob, sizeof(double)); // rowmajor
     gem* A_loc_full = sed_to_dense (A_loc, true);
     double* A_loc_data = A_loc_full->x;
     index incRow = A_loc_full->incRow;

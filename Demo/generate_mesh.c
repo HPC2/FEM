@@ -121,7 +121,9 @@ int main(int argc, char **argv) {
 
     print_dmatrix(x, n, 1, false, "../Problem/x", "dat");
     print_dmatrix(b, n, 1, false, "../Problem/b", "dat"); 
-
+    gem* A_full = sed_to_dense(A, true);
+    double* A_data = A_full->x;
+    print_dmatrix(A_data, n,n, true, "../Problem/A", "dat");
 
     mesh_free(Mesh);
 }
