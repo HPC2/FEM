@@ -169,10 +169,8 @@ int main(int argc, char **argv) {
 
     mesh_free(local_mesh);
     if (rank == 0) mesh_free(global_mesh);
-    free(x); 
-    free(w); 
+    free(x);
     free(b); 
-    free(resi);
     free_comm_buffers(buffers);
     MPI_Finalize();
     return 0;
