@@ -14,6 +14,9 @@ void mpi_jacobi(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* lo
     double* inv_diag = accumulate_inv_diag(coupling, A, buffers);
     dcopy(n, b, 1, resi, 1); // resi <- b
     sysed_spmv(-1, A, x, 1, 1, resi, 1);  // resi <- resi - A*x
+    for ( size_t i = 0; i < nfixed; ++i){
+          resi[fixed[i]] = 0;
+    }
     dcopy(n, resi, 1, w, 1); // w <- resi
     mpi_convert_type2_to_type1(coupling, w, buffers);  // convert w
     dmult(n, inv_diag, 1, w, 1); // w <- D^-1 * w

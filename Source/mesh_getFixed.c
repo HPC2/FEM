@@ -10,7 +10,7 @@ index *mesh_getFixed(const index nCoord, const index *bdry,
     flag = (bool*) calloc(max_ind,sizeof(bool));
     cnt = 0;
     for ( unsigned int i=0 ; i < nBdry ; i++){
-        if (!bdry[4*i+3]){
+        if (bdry[4*i+3] == 0){
             cnt++;
             flag[bdry[4*i]]   = 1;
             flag[bdry[4*i+1]] = 1;

@@ -21,8 +21,8 @@ double g_Neu( double x[2], index typ )
 
 double u_D( double x[2])
 {
-//  return ( 0.0 );
-  return ( x[0] * x[1] );
+  return ( 0.0 );
+//  return ( x[0] * x[1] );
 }
 
 int main(int argc, char **argv) {
@@ -163,8 +163,10 @@ int main(int argc, char **argv) {
 
     // save x
     double* global_x = mpi_assemble_t1_vec(coupling, x, n);
+    double* global_rhs = mpi_assemble_t2_vec(coupling, b, n);
     if (rank == 0) {
-        print_dmatrix(global_x, n_global_nodes, 1, false, "../Problem/x-test1", "dat");
+        print_dmatrix(global_x, n_global_nodes, 1, false, "../Problem/x-test", "dat");
+        print_dmatrix(global_rhs, n_global_nodes, 1, false, "../Problem/b-test", "dat");
     }
 
     mesh_free(local_mesh);
