@@ -1,7 +1,6 @@
 #include "hpc.h"
 
 void mpi_jacobi(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b) {
-    
     index n = A->n;
     index* fixed = local_mesh->fixed;
     index nfixed = local_mesh->nfixed;
@@ -13,7 +12,7 @@ void mpi_jacobi(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* lo
     // jacobi solver
     double* inv_diag = accumulate_inv_diag(coupling, A, buffers);
     dcopy(n, b, 1, resi, 1); // resi <- b
-    sysed_spmv(-1, A, x, 1, 1, resi, 1);  // resi <- resi - A*x
+    sysed_spmv(-1, A, x, 1, 1, resi, 1);  // resi <- b - A*x
     for ( size_t i = 0; i < nfixed; ++i){
           resi[fixed[i]] = 0;
     }
@@ -29,7 +28,7 @@ void mpi_jacobi(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* lo
       daxpy(n, omega, w, 1, x, 1);
       // recalc residuum
       dcopy(n, b, 1, resi, 1); // resi <- b
-      sysed_spmv(-1, A, x, 1, 1, resi, 1);  // resi <- resi - A*x
+      sysed_spmv(-1, A, x, 1, 1, resi, 1);  // resi <- b - A*x
       for ( size_t i = 0; i < nfixed; ++i){
             resi[fixed[i]] = 0;
       }

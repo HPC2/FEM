@@ -6,6 +6,9 @@ void mpi_sum_crosspoints(coupling_data* coupling, double* x, double* cp_buffer) 
     index* cp = coupling -> crossPts;
     index* l2g = coupling -> l2g;
     for (index i = 0; i < n_cp; i++) {
+        cp_buffer[i] = 0;
+    }
+    for (index i = 0; i < n_cp; i++) {
         cp_buffer[l2g[cp[i]]] = x[cp[i]];
     }
     MPI_Allreduce(MPI_IN_PLACE, cp_buffer, coupling->n_global_cp, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
