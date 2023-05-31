@@ -33,6 +33,9 @@ gm: lib generate_mesh.c Makefile
 mpi: lib mpi_mesh_split.c Makefile
 	mpicc $(CF) $(I) -o mpi_mesh_split mpi_mesh_split.c $(CS)
 
+cg: lib test_cg_seq.c Makefile
+	$(CC) $(CF) $(I) -o cg test_cg_seq.c $(CS)
+
 run_test_cases:
 	- mpirun -np 1 --oversubscribe mpi_mesh_split 1 1 1
 	- mpirun -np 1 --oversubscribe mpi_mesh_split 1 1 3

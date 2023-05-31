@@ -245,6 +245,10 @@ void mesh_buildRhs(const mesh *M, double *b, double (*f)(double *, index),
 double kappa( double x[2], index typ );
 double F_vol( double x[2], index typ );
 
+
+void cg_seq(const sed * A, double* f, double *u, double tol, double *u_D, const mesh *M);
+void set_dir(const mesh *M, double *u );
+void set_dir_u_D(const mesh *M, double *u , const double* u_D );
 // ================================ BLAS Functions =============================
 // === Level 1 ===
 void
