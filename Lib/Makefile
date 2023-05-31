@@ -67,7 +67,8 @@ HPC = \
  numbering_write_l2g.o\
  mpi_dot.o \
  mpi_assemble.o \
- comm_buffer_util.o
+ comm_buffer_util.o \
+ mpi_jacobi.o
 
 
 $(HPC): ../Include/hpc.h Makefile
