@@ -161,16 +161,14 @@ int main(int argc, char **argv) {
 
     mpi_jacobi(A, coupling, buffers, local_mesh, x, b);
 
-    // save x
-    double* global_x = mpi_assemble_t1_vec(coupling, x, n);
+    // save A, x and b 
+    double* global_x   = mpi_assemble_t1_vec(coupling, x, n);
     double* global_rhs = mpi_assemble_t2_vec(coupling, b, n);
+    double* global_A   = mpi_assemble_A(A, coupling);
     if (rank == 0) {
         print_dmatrix(global_x, n_global_nodes, 1, false, "../Problem/x-test", "dat");
         print_dmatrix(global_rhs, n_global_nodes, 1, false, "../Problem/b-test", "dat");
-    }
-    double* global_b = mpi_assemble_t2_vec(coupling, b, n);
-    if (rank == 0) {
-        print_dmatrix(global_b, n_global_nodes, 1, false, "../Problem/b-test1", "dat");
+        print_dmatrix(global_A, n_global_nodes, n_global_nodes, true, "../Problem/A-test", "dat");
     }
     
     // free some stuff
