@@ -126,6 +126,8 @@ int main(int argc, char **argv) {
     //----------------------------------//
     // choose tol
     double tol = 1e-5;
+    // choose omega 
+    double omega = 0.5;
     // x0 = 0
     for(int i=0; i<n; i++){
         x[i] = 0;
