@@ -49,9 +49,9 @@ void mpi_sum_interfaces(coupling_data* coupling, double* x, double* if_buffer_se
     }
 }
 
-void mpi_convert_type2_to_type1(coupling_data* coupling, double* x, double* cp_buffer, double* if_buffer_send, double* if_buffer_recv) {
-    mpi_sum_crosspoints(coupling, x, cp_buffer); 
-    mpi_sum_interfaces(coupling, x, if_buffer_send, if_buffer_recv);
+void mpi_convert_type2_to_type1(coupling_data* coupling, double* x, comm_buffers* buffers) {
+    mpi_sum_crosspoints(coupling, x, buffers->cp_buffer); 
+    mpi_sum_interfaces(coupling, x, buffers->if_buffer1, buffers->if_buffer2);
 }
 
 double mpi_dotprod(index n, double* x, double* y) {
@@ -63,13 +63,16 @@ double mpi_dotprod(index n, double* x, double* y) {
     return dotprod;
 }
 
-double* accumulate_inv_diag(coupling_data* coupling, sed* A, double* cp_buffer, double* if_buffer_send, double* if_buffer_recv) {
+double* accumulate_inv_diag(coupling_data* coupling, sed* A, comm_buffers* buffers) {
     index n = A->n;
     double* x = A->x;
     double* d = malloc(sizeof(double) * n);
     for (index i = 0; i < n; i++) {
         d[i] = x[i];
     }
-    mpi_convert_type2_to_type1(coupling, d, cp_buffer, if_buffer_send, if_buffer_recv);
+    mpi_convert_type2_to_type1(coupling, d, buffers);
+    for (index i = 0; i < n; i++) {
+        d[i] = 1/d[i];
+    }
     return d;
 }

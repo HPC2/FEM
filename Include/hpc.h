@@ -108,6 +108,14 @@ typedef struct coupling_data
       index **icoupl_sorted ; // Same as concept as coupl_sorted
 } coupling_data;
 
+// buffers for mpi communication
+typedef struct comm_buffers
+{
+      index n_global_cp; // number of crosspoints
+      double* cp_buffer; // buffer for crosspoints
+      double* if_buffer1; // send-buffer for interface nodes
+      double* if_buffer2; // recv-buffer for interface nodes
+} comm_buffers;
 
 double dot_parallel(double* v_i, double* w_i, index n);
 double* mpi_assemble_A (sed* A_loc, coupling_data* coupling);
@@ -150,8 +158,8 @@ It has size (m+1)(n+1) as the crosspoint nodes have the lowest node numbers
 @parma if_buffer_send A buffer for sending the interface node values
 @param if_buffer_recv A buffer for receiving the interface node values
 */
-void mpi_convert_type2_to_type1(coupling_data* coupling, double* x, double* cp_buffer, double* if_buffer_send, double* if_buffer_recv);
-
+void mpi_convert_type2_to_type1(coupling_data* coupling, double* x, comm_buffers* buffers);
+double* accumulate_inv_diag(coupling_data* coupling, sed* A, comm_buffers* buffers);
 double mpi_dotprod(index n, double* x, double* y);
 
 void *hpc_realloc (void *p, index n, size_t size, index *ok);
@@ -209,6 +217,7 @@ Writes mesh to .co .el .bd files
 @param fname filepath (without file extension)
 */
 void mesh_write(mesh *Mesh, char* fname);
+comm_buffers* alloc_comm_buffers(index n_global_cp, coupling_data* coupling);
 interface_data* rect_interface_data(mesh* Mesh, index n_rows, index n_cols, index n_refinments);
 mesh *mesh_alloc (index ncoord, index nelem, index nbdry);
 mesh *mesh_free (mesh *M);
@@ -237,6 +246,11 @@ double F_vol( double x[2], index typ );
 // === Level 1 ===
 void
 dcopy(index n,
+      const double *x, index incX,
+      double *y, index incY);
+
+void
+dmult(index n,
       const double *x, index incX,
       double *y, index incY);
 

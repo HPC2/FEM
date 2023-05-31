@@ -13,6 +13,16 @@ dcopy(index n,
 }
 
 void
+dmult(index n,
+      const double *x, index incX,
+      double       *y, index incY)
+{
+    for (index i=0; i<n; ++i) {
+        y[i*incY] *= x[i*incX];
+    }
+}
+
+void
 daxpy(index n, double alpha,
       const double *x, index incX,
       double       *y, index incY)

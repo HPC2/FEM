@@ -9,7 +9,7 @@ double kappa( double x[2], index typ )
 
 double F_vol( double x[2], index typ )
 {
-  return ( 0.0 );
+  return ( 1.0 );
 }
 
 double g_Neu( double x[2], index typ )
@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
 
     char pdir[] = "../Problem/";
 
-    index boundaries[4] = {1, 1, 1, 1};
+    index boundaries[4] = {0, 0, 0, 0};
     mesh* Mesh = mesh_create_rect(n_rows, n_cols, boundaries, 0.0, 0.0);
     if(!Mesh) {
         printf("OOM\n");
@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
 
     gem* A_full = sed_to_dense(A, true);
     print_dmatrix(b, n, 1, false, "../Problem/rhs", "dat");
-    print_dmatrix(A_full->x, n, n, true, "../Problem/A", "dat");
+    // print_dmatrix(A_full->x, n, n, true, "../Problem/A", "dat");
     // printf("global rhs:\n");
     // for (index i = 0; i < Mesh->ncoord; i++) {
     //   printf("%4.4lf\n", b[i]);

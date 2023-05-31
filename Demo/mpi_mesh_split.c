@@ -11,7 +11,7 @@ double kappa( double x[2], index typ )
 
 double F_vol( double x[2], index typ )
 {
-  return ( 0.0 );
+  return ( 1.0 );
 }
 
 double g_Neu( double x[2], index typ )
@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
     MPI_Bcast(&n_cols, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&refinements, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-    index global_boundaries[4] = {1, 1, 1, 1};
+    index global_boundaries[4] = {0, 0, 0, 0};
     index* l2g_numbering;
     interface_data* interfaces;
     mesh* global_mesh;
@@ -112,7 +112,11 @@ int main(int argc, char **argv) {
 
     mesh* local_mesh = mesh_create_rect(1, 1, boundaries, offset_x, offset_y);
     local_mesh = mesh_multi_refine(local_mesh, refinements);
-    int n_nodes = (int)local_mesh->ncoord;
+
+    local_mesh->fixed = mesh_getFixed( local_mesh->ncoord, 
+                                 local_mesh->bdry, 
+                                 local_mesh->nbdry, 
+                                &local_mesh->nfixed);
 
     // get pattern of matrix
     sed* A = sed_nz_pattern(local_mesh);
@@ -140,18 +144,70 @@ int main(int argc, char **argv) {
     // broadcast number of global nodes
     MPI_Bcast(&n_global_nodes, 1, MPI_AINT, 0, MPI_COMM_WORLD);
     // create coupling data
-    coupling_data* coupling = mpi_split_interfaces(interfaces, l2g_numbering, n_nodes, n_global_nodes);
+    coupling_data* coupling = mpi_split_interfaces(interfaces, l2g_numbering, n, n_global_nodes);
 
     // coupling_data_print(coupling, rank);
     
     MPI_Bcast(&n_global_crosspoints, 1, MPI_INT, 0, MPI_COMM_WORLD);
     coupling->n_global_cp = n_global_crosspoints;
-    double* cp_buffer = calloc(n_global_crosspoints, sizeof(double));
-    double* if_buffer1 = calloc(coupling->dcoupl[0], sizeof(double));
-    double* if_buffer2 = calloc(coupling->dcoupl[0], sizeof(double));
+    comm_buffers* buffers = alloc_comm_buffers(n_global_crosspoints, coupling);
+
+
+    index* fixed = local_mesh->fixed;
+    index nfixed = local_mesh->nfixed;
+    double* Coord = local_mesh->coord;
+    double x1[2];
+    for ( int k = 0; k < nfixed; ++k)
+    {
+        x1[0] = Coord[2 * fixed[k]]; 
+        x1[1] = Coord[2 * fixed[k]+1];
+
+        x[fixed[k]] = u_D(x1);
+    }
+
+    // jacobi solver
+    double* inv_diag = accumulate_inv_diag(coupling, A, buffers);
+    dcopy(n, b, 1, resi, 1); // resi <- b
+    sysed_spmv(-1, A, x, 1, 1, resi, 1);  // resi <- resi - A*x
+    dcopy(n, resi, 1, w, 1); // w <- resi
+    mpi_convert_type2_to_type1(coupling, w, buffers);  // convert w
+    dmult(n, inv_diag, 1, w, 1); // w <- D^-1 * w
+    double sigma = mpi_dotprod(n, w, resi);
+    printf("rank %d: sigma = %lf\n", rank, sigma);
+    double sigma0 = sigma;
+    double tol = 1e-6;
+    double omega = 1; // full jacobi steps for now
+    while (sigma > tol*sigma0) {
+      // update x
+      daxpy(n, omega, w, 1, x, 1);
+      // recalc residuum
+      dcopy(n, b, 1, resi, 1); // resi <- b
+      sysed_spmv(-1, A, x, 1, 1, resi, 1);  // resi <- resi - A*x
+      for ( size_t i = 0; i < nfixed; ++i){
+            resi[fixed[i]] = 0;
+      }
+      // recalc w
+      dcopy(n, resi, 1, w, 1); // w <- resi
+      mpi_convert_type2_to_type1(coupling, w, buffers);  // convert w
+      dmult(n, inv_diag, 1, w, 1); // w <- D^-1 * w
+      // recalc error 
+      sigma = mpi_dotprod(n, w, resi);
+      if (rank == 0) {
+        printf("sigma = %lf\n", sigma);
+        for (int i = 0; i < n; i++) {
+          printf("%lf\t", x[i]);
+        }
+        printf("\n");
+      }
+    }
+
+    // save x
+    double* global_x = mpi_assemble_t1_vec(coupling, x, n);
+    if (rank = 0) {
+        print_dmatrix(global_x, n_global_nodes, 1, false, "../Problem/x-test1", "dat");
+    }
 
     // double* global_b2 = mpi_assemble_t2_vec(coupling, b, n_nodes); // warning: global_b only contains smth sensible for rank 0
-    // double* global_A = mpi_assemble_A(A, coupling);
     // mpi_convert_type2_to_type1(coupling, b, cp_buffer, if_buffer1, if_buffer2);
     // double* global_b1 = mpi_assemble_t1_vec(coupling, b, n_nodes);
     // if (rank == 0) {
@@ -160,11 +216,11 @@ int main(int argc, char **argv) {
     //   for (int i = 0; i < n_global_nodes; i++) {
     //     assert(fabs(global_b1[i] - global_b2[i]) < 1e-13);
     //   }
-    //   print_dmatrix(global_A, n_global_nodes, n_global_nodes, true, "../Problem/A-test", "dat");
     // }
 
     if (rank == 0) {
-        mesh_free(global_mesh);
+        // mesh_free(global_mesh);
     }
     MPI_Finalize();
+    return 0;
 }
