@@ -67,14 +67,11 @@ HPC = \
  numbering_write_l2g.o\
  mpi_dot.o \
  mpi_assemble.o \
-<<<<<<< Updated upstream
  comm_buffer_util.o \
- mpi_jacobi.o
-=======
- comm_buffer_util.o\
+ mpi_jacobi.o \
+ mpi_cg.o \
  set_dir.o\
  cg_seq.o
->>>>>>> Stashed changes
 
 
 $(HPC): ../Include/hpc.h Makefile

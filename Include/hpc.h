@@ -163,6 +163,7 @@ double* accumulate_inv_diag(coupling_data* coupling, sed* A, comm_buffers* buffe
 double mpi_dotprod(index n, double* x, double* y);
 
 void mpi_jacobi(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b);
+void mpi_cg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b);
 
 void *hpc_realloc (void *p, index n, size_t size, index *ok);
 double hpc_cumsum (index *p, index *c, index n);
