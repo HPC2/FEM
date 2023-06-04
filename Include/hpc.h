@@ -164,6 +164,11 @@ double mpi_dotprod(index n, double* x, double* y);
 
 void mpi_jacobi(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b);
 void mpi_cg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b);
+void mpi_pcg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b);
+void seq_gs(sed* A, mesh* Mesh, double* x, double* b);
+void seq_cg(sed* A, mesh* Mesh, double* x, double* b);
+void seq_pcg(sed* A, mesh* Mesh, double* x, double* b);
+void seq_jacobi(sed* A, mesh* Mesh, double* x, double* b);
 
 void *hpc_realloc (void *p, index n, size_t size, index *ok);
 double hpc_cumsum (index *p, index *c, index n);
@@ -191,7 +196,7 @@ subprocesses.
 @param boundaries 4 x 1 array for boundary condition type in anti-clock wise ordering,
 starting with the lower boundary of the rectangle
 */
-mesh *mesh_create_rect(index n_rows, index n_cols, index *boundaries, double offset_x, double offset_y);
+mesh *mesh_create_rect(index n_rows, index n_cols, index *boundaries, double offset_x, double offset_y, double size_x, double size_y);
 
 /*
 writes a matrix as file "filename.extension"
@@ -220,6 +225,7 @@ Writes mesh to .co .el .bd files
 @param fname filepath (without file extension)
 */
 void mesh_write(mesh *Mesh, char* fname);
+void mesh_flip_edge(mesh* m);
 comm_buffers* alloc_comm_buffers(index n_global_cp, coupling_data* coupling);
 void free_comm_buffers(comm_buffers* buffers);
 interface_data* rect_interface_data(mesh* Mesh, index n_rows, index n_cols, index n_refinments);

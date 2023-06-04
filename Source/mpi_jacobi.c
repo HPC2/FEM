@@ -7,7 +7,7 @@ void mpi_jacobi(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* lo
     index n = A->n;
     index* fixed = local_mesh->fixed;
     index nfixed = local_mesh->nfixed;
-    double tol = 1e-6;
+    double tol = 1e-8;
 
     double* resi = calloc (n, sizeof(double));       // get workspace for residual
     double* w    = calloc (n, sizeof(double));       // get temporary workspace
@@ -20,28 +20,12 @@ void mpi_jacobi(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* lo
           resi[fixed[i]] = 0;
     }
     dcopy(n, resi, 1, w, 1); // w <- resi
-    // if (rank == 1) {
-    //     for (int i = 0; i < n; i++) {
-    //         printf("%d\t", coupling->l2g[i]);
-    //     }
-    //     printf("\n");
-    //     for (int i = 0; i < n; i++) {
-    //         printf("%1.2lf\t", w[i]);
-    //     }
-    //     printf("\n");
-    // }
     mpi_convert_type2_to_type1(coupling, w, buffers);  // convert w
-    // if (rank == 1) {
-    //     for (int i = 0; i < n; i++) {
-    //         printf("%1.2lf\t", w[i]);
-    //     }
-    //     printf("\n");
-    // }
     dmult(n, inv_diag, 1, w, 1); // w <- D^-1 * w
     double sigma = mpi_dotprod(n, w, resi);
     double sigma0 = sigma;
     
-    double omega = 1; // full jacobi steps for now
+    double omega = 0.2; 
     while (sigma > tol*sigma0) {
       // update x
       daxpy(n, omega, w, 1, x, 1);

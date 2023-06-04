@@ -70,8 +70,12 @@ HPC = \
  comm_buffer_util.o \
  mpi_jacobi.o \
  mpi_cg.o \
- set_dir.o\
- cg_seq.o
+ mpi_pcg.o \
+ seq_cg.o \
+ seq_pcg.o \
+ seq_jacobi.o \
+ seq_gs.o \
+ mesh_flip_edge.o
 
 
 $(HPC): ../Include/hpc.h Makefile

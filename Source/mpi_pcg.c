@@ -1,7 +1,7 @@
 #include "hpc.h"
 // #include <mpi.h>
 
-void mpi_cg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b) {
+void mpi_pcg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b) {
       // int rank; MPI_Comm_rank(MPI_COMM_WORLD, &rank);
       // int nof_p; MPI_Comm_size(MPI_COMM_WORLD, &nof_p);
 
@@ -17,7 +17,7 @@ void mpi_cg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_
 
       // cg solver
 
-      // double* inv_diag = accumulate_inv_diag(coupling, A, buffers);  
+      double* inv_diag = accumulate_inv_diag(coupling, A, buffers);  
       dcopy(n, b, 1, resi, 1); // resi <- b
       sysed_spmv(-1, A, x, 1, 1, resi, 1);  // resi <- b - A*x
       for ( size_t i = 0; i < nfixed; ++i){
@@ -25,7 +25,7 @@ void mpi_cg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_
       }
       dcopy(n, resi, 1, w, 1); // w <- resi
       mpi_convert_type2_to_type1(coupling, w, buffers);  // convert w
-      // dmult(n, inv_diag, 1, w, 1); // conditioning: w <- D^-1 * w
+      dmult(n, inv_diag, 1, w, 1); // conditioning: w <- D^-1 * w
       dcopy(n, w, 1, s, 1); // copy w to s
       double sigma = mpi_dotprod(n, w, resi);
       double sigma0 = sigma;
@@ -43,7 +43,7 @@ void mpi_cg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_
         // recalc w
         dcopy(n, resi, 1, w, 1); // w <- resi
         mpi_convert_type2_to_type1(coupling, w, buffers);  // convert w
-        // dmult(n, inv_diag, 1, w, 1); // conditioning: w <- D^-1 * w
+        dmult(n, inv_diag, 1, w, 1); // conditioning: w <- D^-1 * w
         // recalc error 
         sigma = mpi_dotprod(n, w, resi);
         //if (rank == 0) printf("sigma: %4.4lf\n", sigma);
@@ -54,7 +54,7 @@ void mpi_cg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_
         daxpy(n, 1, w, 1, s, 1);
       }
 
-      // free(inv_diag);
+      free(inv_diag);
       free(resi);
       free(w);
       free(s);

@@ -1,7 +1,7 @@
 #include "hpc.h"
 #include <stdio.h>
 
-mesh *mesh_create_rect(index n_rows, index n_cols, index *boundaries, double offset_x, double offset_y) {
+mesh *mesh_create_rect(index n_rows, index n_cols, index *boundaries, double offset_x, double offset_y, double size_x, double size_y) {
     index n_nodes_row = n_rows + 1;
     index n_nodes_col = n_cols + 1;
     index n_nodes = n_nodes_row*n_nodes_col;
@@ -15,8 +15,8 @@ mesh *mesh_create_rect(index n_rows, index n_cols, index *boundaries, double off
     for (index i = 0; i < n_nodes_row; i++) {     // row_idx -> y-direction (vertical)
         for (index j = 0; j < n_nodes_col; j++) { // col_idx -> x-direction (horizontal)
             index node_id = i*n_nodes_col+j;
-            coords[2*node_id+0] = 1.0*j + offset_x;
-            coords[2*node_id+1] = 1.0*i + offset_y;
+            coords[2*node_id+0] = (1.0*j + offset_x)*size_x/n_cols;
+            coords[2*node_id+1] = (1.0*i + offset_y)*size_y/n_rows;
         }
     }
 

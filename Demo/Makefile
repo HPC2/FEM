@@ -27,14 +27,11 @@ lib:
 hpc_demo0: lib hpc_demo0.c Makefile
 	$(CC) $(CF) $(I) -o hpc_demo0 hpc_demo0.c $(CS)
 
-gm: lib generate_mesh.c Makefile
-	$(CC) $(CF) $(I) -o gm generate_mesh.c $(CS)
+seq: lib seq_fem.c Makefile
+	$(CC) $(CF) $(I) -o seq_fem seq_fem.c $(CS)
 
-cq: lib cq_seq.c Makefile
-	$(CC) $(CF) $(I) -o cq cq_seq.c $(CS)
-
-mpi: lib mpi_mesh_split.c Makefile
-	mpicc $(CF) $(I) -o mpi_mesh_split mpi_mesh_split.c $(CS)
+mpi: lib mpi_fem.c Makefile
+	mpicc $(CF) $(I) -o mpi_fem mpi_fem.c $(CS)
 
 cg: lib test_cg_seq.c Makefile
 	$(CC) $(CF) $(I) -o cg test_cg_seq.c $(CS)

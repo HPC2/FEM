@@ -57,6 +57,7 @@ dkms.conf
 Demo/hpc_demo0
 Demo/gm
 Demo/mpi_mesh_split
+Demo/seq_fem
 *.co
 *.el
 *.bd
