@@ -80,6 +80,42 @@ coupling_data* mpi_split_interfaces(interface_data* interfaces, index* l2g, int 
             }
         }
     }
+
+    coupling->n_v_nodes = 0;
+    for (int i = 0; i < coupling->ncoupl; i++) {
+        coupling->n_v_nodes += coupling->dcoupl[i];
+    }
+    coupling->v_nodes = malloc(sizeof(index)*coupling->n_v_nodes);
+    bool* buffer = calloc(n_nodes, sizeof(bool));
+    int offset = 0;
+    for (int i = 0; i < coupling->ncoupl; i++) {
+        for (int j = 0; j < coupling->dcoupl[i]; j++) {
+            coupling->v_nodes[offset++] = coupling->icoupl[i][j];
+            buffer[coupling->icoupl[i][j]] = 1;
+        }
+    }
+    for (int i = 0; i < coupling->n_local_cp; i++) {
+        buffer[coupling->crossPts[i]] = 1;
+    }
+    coupling->n_i_nodes = n_nodes - coupling->n_v_nodes - coupling->n_local_cp;
+    coupling->i_nodes = malloc(sizeof(index)*coupling->n_i_nodes);
+    offset = 0;
+    for (index i = 0; i < n_nodes; i++) {
+        if(!buffer[i]) coupling->i_nodes[offset++] = i;
+    }
+
+    // if (rank == 0) {
+    //     printf("v nodes: \n");
+    //     for (int i = 0; i < coupling->n_v_nodes; i++) {
+    //         printf("%td\t", coupling->v_nodes[i]);
+    //     }
+    //     printf("\n");
+    //     printf("i nodes: \n");
+    //     for (int i = 0; i < coupling->n_i_nodes; i++) {
+    //         printf("%td\t", coupling->i_nodes[i]);
+    //     }
+    //     printf("\n");
+    // }
     
     // Build coupl_sorted and icoupl_sorted
     sort_coupl(coupling);

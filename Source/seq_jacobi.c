@@ -1,6 +1,6 @@
 #include "hpc.h"
 
-void seq_jacobi(sed* A, mesh* Mesh, double* x, double* b) {
+index seq_jacobi(sed* A, mesh* Mesh, double* x, double* b) {
 
     index n = A->n;
     double* w    = calloc (n, sizeof(double));
@@ -11,6 +11,7 @@ void seq_jacobi(sed* A, mesh* Mesh, double* x, double* b) {
 
     // Jacobi sequetiell
     //--------------------------------------------------------//
+    index n_iter = 0;
     // choose tol
     double tol = 1e-8;
     // choose omega 
@@ -36,10 +37,9 @@ void seq_jacobi(sed* A, mesh* Mesh, double* x, double* b) {
     // sigma <- w'*resi
     double sigma0 = ddot(n, w,1, resi,1);
     double sigma = sigma0;
-    int k = 0;
     //for(k = 0; k<10000; ) {
     while(sigma > tol*sigma0){
-        k = k+1;
+        n_iter++;
         // x <- x + omega*w
         daxpy(n, omega,w,1, x,1);
         // resi <-- b
@@ -62,4 +62,6 @@ void seq_jacobi(sed* A, mesh* Mesh, double* x, double* b) {
     free(w);
     free(resi);
     free(d);
+
+    return n_iter;
 }

@@ -41,6 +41,62 @@ sysed_spmv(double alpha,
     }
 }
 
+// symmetric sed general matrix vector product
+// y <- alpha * A * x + beta * y 
+void
+indexed_sysed_spmv(
+           index m,
+           index n, 
+           double alpha,
+           const sed *A,
+           const double *x, index incX,
+           double beta,
+           double *y, index incY,
+           const index *indices_x,
+           const index *indices_y)
+{
+    // HELP :(
+    index p, j, *Ai ;
+    double *Ax;
+
+    // For convenience
+    Ai = A->i ; 
+    Ax = A->x ;
+
+    // Scal y
+    indexed_dscal(m, beta, y, incY, indices_y);
+
+    if (alpha==0 || n==0) {
+        return;
+    }
+
+    for (j = 0 ; j < m ; j++)
+    {
+        
+        // Diagonal
+        y[indices_y[j]*incY] += alpha*Ax[indices_y[j]] * x[indices_y[j]*incX] ;
+
+        index offset_x = 0;
+        index offset_y = 0;
+        // Sub/Super-Diagonal
+        for (p = Ai[indices_y[j]+1]-1 ; p >= Ai[indices_y[j]] ; p--)
+        {  
+            // printf("%td\n", Ai[p]) ;
+            if (Ai[p] == indices_x[offset_x]) {
+                ++offset_x;
+                // upper part ddot-based
+                y[indices_y[j]*incY] += alpha * Ax[p] * x[Ai[p]*incX] ;
+            }
+            if (Ai[p] == indices_y[offset_y]) {
+                ++offset_y;
+                // lower part axpy-based
+                y[Ai[p]*incY] += alpha * Ax[p] * x[indices_y[j]*incX] ;
+            }
+            
+        }
+    }
+}
+
 
 #ifndef AXPYF
 #define AXPYF 4
@@ -124,6 +180,37 @@ dgemv(size_t m, size_t n,
         dgemv_axpyf(m, n, alpha, A, incRowA, incColA, x, incX, y, incY);
     } else {
         dgemv_dotf(m, n, alpha, A, incRowA, incColA, x, incX, y, incY);
+    }
+}
+
+void
+indexed_dgemv(size_t m, size_t n,
+      double alpha,
+      const double *A, ptrdiff_t incRowA, ptrdiff_t incColA,
+      const double *x, ptrdiff_t incX,
+      double beta,
+      double *y, ptrdiff_t incY,
+      index *indices_x,
+      index *indices_y)
+{
+    indexed_dscal(m, beta, y, incY, indices_y);
+
+    if (alpha==0 || m==0 || n==0) {
+        return;
+    }
+
+    if (incRowA<incColA) {
+        for (index j = 0; j < n; j++) {
+            for (index i = 0; i < m; i++) {
+                y[indices_y[i]*incY] += alpha*A[indices_y[i]*incRowA + indices_x[j]*incColA]*x[indices_x[j]*incX];
+            }
+        }
+    } else {
+        for (index i = 0; i < m; i++) {
+            for (index j = 0; j < n; j++) {
+                y[indices_y[i]*incY] += alpha*A[indices_y[i]*incRowA + indices_x[j]*incColA]*x[indices_x[j]*incX];
+            }
+        }
     }
 }
 

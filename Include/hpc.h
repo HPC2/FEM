@@ -99,6 +99,10 @@ typedef struct coupling_data
       index n_global_cp; // number of global crosspoints
       index n_local_cp; // number of local crosspoints
       index* crossPts; /* crosspoints */
+      index n_v_nodes; // number of interface nodes
+      index* v_nodes; // id's of interface nodes
+      index n_i_nodes; // number of inner nodes
+      index* i_nodes;  // ids of inner nodes
       index* l2g; /* local to global node numbering */
       index ncoupl ; /* local number of coupling interfaces */
       index *coupl ; /* local coupling interfaces ([a1,e1,l1,r1,c1], ... ) */
@@ -165,10 +169,10 @@ double mpi_dotprod(index n, double* x, double* y);
 void mpi_jacobi(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b);
 void mpi_cg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b);
 void mpi_pcg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b);
-void seq_gs(sed* A, mesh* Mesh, double* x, double* b);
-void seq_cg(sed* A, mesh* Mesh, double* x, double* b);
-void seq_pcg(sed* A, mesh* Mesh, double* x, double* b);
-void seq_jacobi(sed* A, mesh* Mesh, double* x, double* b);
+index seq_gs(sed* A, mesh* Mesh, double* x, double* b);
+index seq_cg(sed* A, mesh* Mesh, double* x, double* b);
+index seq_pcg(sed* A, mesh* Mesh, double* x, double* b);
+index seq_jacobi(sed* A, mesh* Mesh, double* x, double* b);
 
 void *hpc_realloc (void *p, index n, size_t size, index *ok);
 double hpc_cumsum (index *p, index *c, index n);
@@ -264,14 +268,32 @@ dcopy(index n,
       double *y, index incY);
 
 void
+indexed_dcopy(index n,
+      const double *x, index incX,
+      double       *y, index incY,
+      const index *indices);
+
+void
 dmult(index n,
       const double *x, index incX,
       double *y, index incY);
 
 void
+indexed_dmult(index n,
+      const double *x, index incX,
+      double       *y, index incY,
+      const index *indices);
+
+void
 daxpy(index n, double alpha,
       const double *x, index incX,
       double *y, index incY);
+
+void
+indexed_daxpy(index n, double alpha,
+      const double *x, index incX,
+      double       *y, index incY,
+      const index *indices);
 
 double
 ddot(index n,
@@ -289,6 +311,12 @@ dscal(index  n,
       double alpha,
       double *x, index incX);
 
+void
+indexed_dscal(index  n,
+      double alpha,
+      double *x, index incX,
+      const index *indices);
+
 // === Level 2 ===
 void
 sysed_spmv(double alpha,
@@ -296,6 +324,18 @@ sysed_spmv(double alpha,
            const double *x, index incX,
            double beta,
            double *y, index incY);
+
+void
+indexed_sysed_spmv(
+           index m,
+           index n, 
+           double alpha,
+           const sed *A,
+           const double *x, index incX,
+           double beta,
+           double *y, index incY,
+           const index *indices_x,
+           const index *indices_y);
 
 
 void
@@ -328,6 +368,16 @@ dgemv(size_t m, size_t n,
       const double *x, ptrdiff_t incX,
       double beta,
       double *y, ptrdiff_t incY);
+
+void
+indexed_dgemv(size_t m, size_t n,
+      double alpha,
+      const double *A, ptrdiff_t incRowA, ptrdiff_t incColA,
+      const double *x, ptrdiff_t incX,
+      double beta,
+      double *y, ptrdiff_t incY,
+      index *indices_x,
+      index *indices_y);
 
 
 void

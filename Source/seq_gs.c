@@ -1,6 +1,6 @@
 #include "hpc.h"
 
-void seq_gs(sed* A, mesh* Mesh, double* x, double* b) {
+index seq_gs(sed* A, mesh* Mesh, double* x, double* b) {
 
     index n = A->n;
     double* w    = calloc (n, sizeof(double));
@@ -9,6 +9,8 @@ void seq_gs(sed* A, mesh* Mesh, double* x, double* b) {
     index* fixed       = Mesh->fixed ;
 
     double tol = 1e-8;
+
+    index n_iter = 0;
 
     // Calculate square norm of residual
      // resi <-- b
@@ -24,6 +26,7 @@ void seq_gs(sed* A, mesh* Mesh, double* x, double* b) {
      double sigma0 = sigma;
 
     while (sigma > tol*sigma0) {
+        n_iter++;
         // Sym Gauss-Seidel iterations
         sed_gs_constr(A, b, x, w, fixed, nfixed, 1); 
         sed_gs_constr(A, b, x, w, fixed, nfixed, 0); 
@@ -42,4 +45,5 @@ void seq_gs(sed* A, mesh* Mesh, double* x, double* b) {
 
     free(w);
     free(resi);
+    return n_iter;
 }

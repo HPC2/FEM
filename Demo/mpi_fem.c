@@ -119,7 +119,9 @@ int main(int argc, char **argv) {
     mesh* local_mesh = mesh_create_rect(1, 1, boundaries, offset_x, offset_y, size_x, size_y);
     local_mesh = mesh_multi_refine(local_mesh, refinements);
 
-    // mesh_flip_edge(local_mesh);
+    if (!strcmp(solver, gauss_seidel)) {
+      mesh_flip_edge(local_mesh);
+    }
 
     local_mesh->fixed = mesh_getFixed( local_mesh->ncoord, 
                                  local_mesh->bdry, 

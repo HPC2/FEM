@@ -100,14 +100,16 @@ int main(int argc, char **argv) {
         x[fixed[k]] = u_D(x1);
     }
 
+    index n_iter;
+
     if (!strcmp(solver, jacobi)) {
-      seq_jacobi(A, Mesh, x, b);
+      n_iter = seq_jacobi(A, Mesh, x, b);
     } else if (!strcmp(solver, gauss_seidel)) {
-      seq_gs(A, Mesh, x, b);
+      n_iter = seq_gs(A, Mesh, x, b);
     } else if (!strcmp(solver, cg)) {
-      seq_cg(A, Mesh, x, b);
+      n_iter = seq_cg(A, Mesh, x, b);
     } else if (!strcmp(solver, pcg)) {
-      seq_pcg(A, Mesh, x, b);
+      n_iter = seq_pcg(A, Mesh, x, b);
     } else {
       printf("Solver unknown\n");
       return -1;

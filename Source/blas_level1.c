@@ -13,12 +13,34 @@ dcopy(index n,
 }
 
 void
+indexed_dcopy(index n,
+      const double *x, index incX,
+      double       *y, index incY,
+      const index *indices)
+{
+    for (index i=0; i<n; ++i) {
+        y[indices[i]*incY] = x[indices[i]*incX];
+    }
+}
+
+void
 dmult(index n,
       const double *x, index incX,
       double       *y, index incY)
 {
     for (index i=0; i<n; ++i) {
         y[i*incY] *= x[i*incX];
+    }
+}
+
+void
+indexed_dmult(index n,
+      const double *x, index incX,
+      double       *y, index incY,
+      const index *indices)
+{
+    for (index i=0; i<n; ++i) {
+        y[indices[i]*incY] *= x[indices[i]*incX];
     }
 }
 
@@ -32,6 +54,20 @@ daxpy(index n, double alpha,
     }
     for (index i=0; i<n; ++i) {
         y[i*incY] += alpha*x[i*incX];
+    }
+}
+
+void
+indexed_daxpy(index n, double alpha,
+      const double *x, index incX,
+      double       *y, index incY,
+      const index *indices)
+{
+    if (alpha == 0){
+        return;
+    }
+    for (index i=0; i<n; ++i) {
+        y[indices[i]*incY] += alpha*x[indices[i]*incX];
     }
 }
 
@@ -95,6 +131,29 @@ dscal(index  n,
     } else {
         for (index i=0; i<n; ++i) {
             x[i*incX] = 0;
+        }
+    }
+}
+
+void
+indexed_dscal(index  n,
+      double alpha,
+      double *x, index incX,
+      const index *indices)
+{
+    // No-op if alpha 1
+    if (alpha==1) {
+        return;
+    }
+
+    // Scaling
+    if (alpha!=0) {
+        for (index i=0; i<n; ++i) {
+            x[indices[i]*incX] *= alpha;
+        }
+    } else {
+        for (index i=0; i<n; ++i) {
+            x[indices[i]*incX] = 0;
         }
     }
 }

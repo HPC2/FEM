@@ -1,6 +1,6 @@
 #include "hpc.h"
 
-void seq_pcg(sed* A, mesh* Mesh, double* x, double* b) {
+index seq_pcg(sed* A, mesh* Mesh, double* x, double* b) {
 
     index n = A->n;
     double* w    = calloc (n, sizeof(double));
@@ -12,6 +12,8 @@ void seq_pcg(sed* A, mesh* Mesh, double* x, double* b) {
     index* fixed = Mesh->fixed ;
 
     double tol = 1e-8;
+
+    index n_iter = 0;
 
     double* A_data = A->x;
     for(int i=0; i<n; i++){
@@ -32,6 +34,7 @@ void seq_pcg(sed* A, mesh* Mesh, double* x, double* b) {
     double alpha;
     double beta;
     while (sigma > tol*sigma0) {
+        n_iter++;
         sysed_spmv(1, A, s, 1, 0, v, 1);
         for ( size_t i = 0; i < nfixed; ++i){
             v[fixed[i]] = 0;
@@ -53,4 +56,6 @@ void seq_pcg(sed* A, mesh* Mesh, double* x, double* b) {
     free(resi);
     free(v);
     free(s);
+
+    return n_iter;
 }
