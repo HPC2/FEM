@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include <stdbool.h>
+#include <sys/time.h>
 
 #define index ptrdiff_t
 
@@ -408,5 +409,22 @@ printIGeMatrix(size_t m, size_t n,
 #define HPC_CSC(A) (A && (A->nz == -1))
 #define HPC_CSR(A) (A && (A->nz == -2))
 #define HPC_TRIPLET(A) (A && (A->nz >= 0))
+
+//=== RESULT
+void result_write(
+    char* result_name,
+    int n_rows,
+    int n_cols,
+    int n_refs,
+    char* solver,
+    int n_coords,
+    int dt_build_S,
+    int dt_build_rhs,
+    int dt_solve
+);
+struct timeval tv[100];
+#define TIME_SAVE(j)   (gettimeofday(&tv[j], (struct timezone*)0))
+#define TIME_ELAPSED(j,k)	(1.E+6*(tv[k].tv_sec-tv[j].tv_sec)+(tv[k].tv_usec-tv[j].tv_usec))
+
 #endif
 

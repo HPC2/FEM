@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "hpc.h"
 
+
 double kappa( double x[2], index typ )
 {
   return ( 1.0 );
@@ -30,8 +31,8 @@ char* pcg = "pcg";
 
 
 int main(int argc, char **argv) {
-    if (argc != 5) {
-        printf("Pass [rows] [cols] [refinements] [solver] as arguments\n");
+    if (argc != 6) {
+        printf("Pass [rows] [cols] [refinements] [solver] [result_name] as arguments\n");
         return -1;
     }
 
@@ -39,6 +40,8 @@ int main(int argc, char **argv) {
     int n_cols = atoi(argv[2]); //anzahl an Spalten
     int refinements = atoi(argv[3]);
     char* solver = argv[4];
+    char* result_name = argv[5];
+
 
     index boundaries[4] = {1, 0, 0, 0};
     mesh* Mesh = mesh_create_rect(n_rows, n_cols, boundaries, 0.0, 0.0, 1.0, 1.0);
@@ -51,6 +54,7 @@ int main(int argc, char **argv) {
                     &Mesh->nedges,
                     &Mesh->edge2no);
     
+
     // refine the mesh
     for(int i=0; i<refinements; i++) {
         Mesh = mesh_refine(Mesh);
@@ -73,7 +77,9 @@ int main(int argc, char **argv) {
     if (!A) return(1);
 
     // Build stiffness matrix
+    TIME_SAVE(10);
     if ( !sed_buildS(Mesh, A) ) return(1); // assemble coefficient matrix
+    TIME_SAVE(11);
 
     // Get storage for rhs and solution
     index n    = A->n;
@@ -82,7 +88,9 @@ int main(int argc, char **argv) {
     double* b    = calloc (n, sizeof(double));       // get workspace for rhs
 
     // Build rhs (Volume and Neumann data)
+    TIME_SAVE(20);
     mesh_buildRhs(Mesh, b, F_vol, g_Neu);
+    TIME_SAVE(21);
 
     // For convenience
     index nfixed = Mesh->nfixed ; 
@@ -99,9 +107,11 @@ int main(int argc, char **argv) {
 
         x[fixed[k]] = u_D(x1);
     }
+    TIME_SAVE(22);
 
     index n_iter;
 
+    TIME_SAVE(30);
     if (!strcmp(solver, jacobi)) {
       n_iter = seq_jacobi(A, Mesh, x, b);
     } else if (!strcmp(solver, gauss_seidel)) {
@@ -114,6 +124,19 @@ int main(int argc, char **argv) {
       printf("Solver unknown\n");
       return -1;
     }
+    TIME_SAVE(31);
+
+    result_write(
+      result_name,
+      n_rows,
+      n_cols,
+      refinements,
+      solver,
+      Mesh->ncoord,
+      (int)TIME_ELAPSED(10,11),
+      (int)TIME_ELAPSED(20,22),
+      (int)TIME_ELAPSED(30,31)
+      );
 
     char buf[200];
     sprintf(buf, "../Problem/x_seq_%s", solver);

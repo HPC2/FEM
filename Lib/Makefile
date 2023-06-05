@@ -75,7 +75,8 @@ HPC = \
  seq_pcg.o \
  seq_jacobi.o \
  seq_gs.o \
- mesh_flip_edge.o
+ mesh_flip_edge.o \
+ result.o 
 
 
 $(HPC): ../Include/hpc.h Makefile

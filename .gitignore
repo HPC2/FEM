@@ -67,3 +67,4 @@ Demo/mpi_fem
 *.if
 *.l2g
 *.dat
+Result/*.csv
