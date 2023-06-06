@@ -167,9 +167,9 @@ void mpi_convert_type2_to_type1(coupling_data* coupling, double* x, comm_buffers
 double* accumulate_inv_diag(coupling_data* coupling, sed* A, comm_buffers* buffers);
 double mpi_dotprod(index n, double* x, double* y);
 
-void mpi_jacobi(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b);
-void mpi_cg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b);
-void mpi_pcg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b);
+index mpi_jacobi(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b);
+index mpi_cg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b);
+index mpi_pcg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b);
 index seq_gs(sed* A, mesh* Mesh, double* x, double* b);
 index seq_cg(sed* A, mesh* Mesh, double* x, double* b);
 index seq_pcg(sed* A, mesh* Mesh, double* x, double* b);
@@ -413,11 +413,16 @@ printIGeMatrix(size_t m, size_t n,
 //=== RESULT
 void result_write(
     char* result_name,
+    int n_processors,
     int n_rows,
     int n_cols,
     int n_refs,
     char* solver,
+    int n_iter_max,
+    int n_iter_min,
+    int n_iter_sum,
     int n_coords,
+    index* boundaries,
     int dt_build_S,
     int dt_build_rhs,
     int dt_solve

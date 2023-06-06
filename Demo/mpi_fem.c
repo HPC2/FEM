@@ -41,10 +41,11 @@ int main(int argc, char **argv) {
     index n_global_nodes;
     int n_global_crosspoints;
     char solver[10];
+    char result_name[256];
 
     if (rank == 0) {
-        if (argc != 5) {
-          printf("Pass [rows] [cols] [refinements] [solver] as arguments\n");
+        if (argc != 6) {
+          printf("Pass [rows] [cols] [refinements] [solver] [result_name] as arguments\n");
           return -1;
         }
 
@@ -52,6 +53,7 @@ int main(int argc, char **argv) {
         n_cols = atoi(argv[2]); //anzahl an Spalten
         refinements = atoi(argv[3]);
         strcpy(solver, argv[4]);
+        strcpy(result_name, argv[5]);
         assert(nof_p == n_rows * n_cols);
     }
 
@@ -133,7 +135,10 @@ int main(int argc, char **argv) {
     if (!A) return(1);
 
     // Build stiffness matrix
+    TIME_SAVE(10);
     if ( !sed_buildS(local_mesh, A) ) return(1); // assemble coefficient matrix
+    MPI_Barrier(MPI_COMM_WORLD);
+    TIME_SAVE(11);
 
     // Print the matrix
     // if (rank == 0) {
@@ -147,7 +152,10 @@ int main(int argc, char **argv) {
     double* b    = calloc (n, sizeof(double));       // get workspace for rhs
 
     // Build rhs (Volume and Neumann data)
+    TIME_SAVE(20);
     mesh_buildRhs(local_mesh, b, F_vol, g_Neu); 
+    MPI_Barrier(MPI_COMM_WORLD);
+    TIME_SAVE(21);
 
     // broadcast number of global nodes
     MPI_Bcast(&n_global_nodes, 1, MPI_AINT, 0, MPI_COMM_WORLD);
@@ -171,23 +179,55 @@ int main(int argc, char **argv) {
 
         x[fixed[k]] = u_D(x1);
     }
+    MPI_Barrier(MPI_COMM_WORLD);
+    TIME_SAVE(22);
 
+    index n_iter;
+    TIME_SAVE(30);
     if (!strcmp(solver, jacobi)) {
-      mpi_jacobi(A, coupling, buffers, local_mesh, x, b);
+      n_iter = mpi_jacobi(A, coupling, buffers, local_mesh, x, b);
     } else if (!strcmp(solver, gauss_seidel)) {
       printf("Gauss-Seidel not yet implemented :(\n");
       MPI_Finalize();
       return -1;
     } else if (!strcmp(solver, cg)) {
-      mpi_cg(A, coupling, buffers, local_mesh, x, b);
+      n_iter = mpi_cg(A, coupling, buffers, local_mesh, x, b);
     } else if (!strcmp(solver, pcg)) {
-      mpi_pcg(A, coupling, buffers, local_mesh, x, b);
+      n_iter = mpi_pcg(A, coupling, buffers, local_mesh, x, b);
     } else {
       printf("Solver unknown\n");
       MPI_Finalize();
       return -1;
     }
+    MPI_Barrier(MPI_COMM_WORLD);
+    TIME_SAVE(31);
 
+    // Write result
+    index n_iter_max=0;
+    index n_iter_min=0;
+    index n_iter_sum=0;
+    MPI_Reduce(&n_iter, &n_iter_max,1,MPI_INT,MPI_MAX,0,MPI_COMM_WORLD);
+    MPI_Reduce(&n_iter, &n_iter_min,1,MPI_INT,MPI_MIN,0,MPI_COMM_WORLD);
+    MPI_Reduce(&n_iter, &n_iter_sum,1,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
+
+    if (rank==0){
+      result_write(
+        result_name,
+        nof_p,
+        n_rows,
+        n_cols,
+        refinements,
+        solver,
+        n_iter_max,
+        n_iter_min,
+        n_iter_sum,
+        global_mesh->ncoord,
+        global_boundaries,
+        (int)TIME_ELAPSED(10,11),
+        (int)TIME_ELAPSED(20,22),
+        (int)TIME_ELAPSED(30,31)
+      );
+    }
     // save A, x and b 
     double* global_x = mpi_assemble_t1_vec(coupling, x, n);
     // double* global_rhs = mpi_assemble_t2_vec(coupling, b, n);
@@ -207,7 +247,7 @@ int main(int argc, char **argv) {
     free(x);
     free(b); 
     free_comm_buffers(buffers);
-
+    
     // stop MPI and return
     MPI_Finalize();
     return 0;

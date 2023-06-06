@@ -1,7 +1,7 @@
 #include "hpc.h"
 // #include <mpi.h>
 
-void mpi_pcg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b) {
+index mpi_pcg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b) {
       // int rank; MPI_Comm_rank(MPI_COMM_WORLD, &rank);
       // int nof_p; MPI_Comm_size(MPI_COMM_WORLD, &nof_p);
 
@@ -9,6 +9,7 @@ void mpi_pcg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local
       index* fixed = local_mesh->fixed;
       index nfixed = local_mesh->nfixed;
       double tol = 1e-8;
+      index n_iter = 0;
 
       double* resi = calloc (n, sizeof(double));       // get workspace for residual
       double* w    = calloc (n, sizeof(double));       // get temporary workspace
@@ -31,8 +32,9 @@ void mpi_pcg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local
       double sigma0 = sigma;
       double sigma_old = sigma;
       double alpha, beta;
-      index iter = 0;
+      
       while (sigma > tol*sigma0) {
+        n_iter++;
         sysed_spmv(1, A, s, 1, 0, v, 1);  // v <- A*s
         for ( size_t i = 0; i < nfixed; ++i){
               v[fixed[i]] = 0;
@@ -59,4 +61,5 @@ void mpi_pcg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local
       free(w);
       free(s);
       free(v);
+      return n_iter;
 }

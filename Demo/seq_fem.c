@@ -42,13 +42,13 @@ int main(int argc, char **argv) {
     char* solver = argv[4];
     char* result_name = argv[5];
 
-
     index boundaries[4] = {1, 0, 0, 0};
     mesh* Mesh = mesh_create_rect(n_rows, n_cols, boundaries, 0.0, 0.0, 1.0, 1.0);
     if(!Mesh) {
         printf("OOM\n");
         return 1;
     }
+
     mesh_getEdge2no( Mesh->nelem, 
                      Mesh->elem, 
                     &Mesh->nedges,
@@ -65,6 +65,7 @@ int main(int argc, char **argv) {
                     &Mesh->edge2no);
     }
 
+    mesh_write(Mesh,"seq_FEM_CG");
     // mesh_flip_edge(Mesh);
 
     Mesh->fixed = mesh_getFixed( Mesh->ncoord, 
@@ -128,11 +129,16 @@ int main(int argc, char **argv) {
 
     result_write(
       result_name,
+      1,
       n_rows,
       n_cols,
       refinements,
       solver,
+      n_iter,
+      n_iter,
+      n_iter,
       Mesh->ncoord,
+      boundaries,
       (int)TIME_ELAPSED(10,11),
       (int)TIME_ELAPSED(20,22),
       (int)TIME_ELAPSED(30,31)
