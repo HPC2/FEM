@@ -24,6 +24,10 @@ double u_D( double x[2])
 //   return ( x[0] * x[1] );
 }
 
+struct timeval tv[100];
+#define TIME_SAVE(j)   (gettimeofday(&tv[j], (struct timezone*)0))
+#define TIME_ELAPSED(j,k)	(1.E+6*(tv[k].tv_sec-tv[j].tv_sec)+(tv[k].tv_usec-tv[j].tv_usec))
+
 char* jacobi = "jacobi";
 char* gauss_seidel = "gs";
 char* cg = "cg";
@@ -66,7 +70,6 @@ int main(int argc, char **argv) {
                     &Mesh->edge2no);
     }
 
-    mesh_write(Mesh,"seq_FEM_CG");
     // mesh_flip_edge(Mesh);
 
     Mesh->fixed = mesh_getFixed( Mesh->ncoord, 

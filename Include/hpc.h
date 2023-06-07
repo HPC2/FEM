@@ -429,9 +429,6 @@ void result_write(
     int dt_build_rhs,
     int dt_solve
 );
-struct timeval tv[100];
-#define TIME_SAVE(j)   (gettimeofday(&tv[j], (struct timezone*)0))
-#define TIME_ELAPSED(j,k)	(1.E+6*(tv[k].tv_sec-tv[j].tv_sec)+(tv[k].tv_usec-tv[j].tv_usec))
 
 #endif
 
