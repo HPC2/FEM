@@ -21,6 +21,7 @@ void result_write(
     int n_iter_sum,
     int n_coords,
     index* boundaries,
+    int dt_init,
     int dt_build_S,
     int dt_build_rhs,
     int dt_solve
@@ -39,6 +40,7 @@ void result_write(
         fprintf (f,"n_iter_sum,");
         fprintf (f,"n_processors,");
         fprintf (f,"n_coords,");
+        fprintf (f,"dt_init");
         fprintf (f,"dt_build_S,");
         fprintf (f,"dt_build_rhs,");
         fprintf (f,"dt_solve,");
@@ -48,7 +50,7 @@ void result_write(
         fprintf (f,"glob_b3\n");
         
     }
-    fprintf(f,"%i,%i,%i,%s,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\n",
+    fprintf(f,"%i,%i,%i,%s,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\n",
       n_rows,
       n_cols,
       n_refs,
@@ -58,6 +60,7 @@ void result_write(
       n_iter_sum,
       n_processors,
       n_coords,
+      dt_init,
       dt_build_S,
       dt_build_rhs,
       dt_solve,

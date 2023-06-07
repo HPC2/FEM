@@ -70,6 +70,7 @@ HPC = \
  comm_buffer_util.o \
  mpi_jacobi.o \
  mpi_cg.o \
+ mpi_gs.o \
  mpi_pcg.o \
  seq_cg.o \
  seq_pcg.o \

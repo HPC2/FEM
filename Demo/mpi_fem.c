@@ -57,6 +57,8 @@ int main(int argc, char **argv) {
         assert(nof_p == n_rows * n_cols);
     }
 
+    TIME_SAVE(0);
+
     // broadcat number of refinements
     MPI_Bcast(&n_rows, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&n_cols, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -130,6 +132,21 @@ int main(int argc, char **argv) {
                                  local_mesh->nbdry, 
                                 &local_mesh->nfixed);
 
+    index n    = local_mesh->ncoord;
+
+    // broadcast number of global nodes
+    MPI_Bcast(&n_global_nodes, 1, MPI_AINT, 0, MPI_COMM_WORLD);
+    // create coupling data
+    coupling_data* coupling = mpi_split_interfaces(interfaces, l2g_numbering, n, n_global_nodes);
+
+    // coupling_data_print(coupling, rank);
+    
+    MPI_Bcast(&n_global_crosspoints, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    coupling->n_global_cp = n_global_crosspoints;
+    comm_buffers* buffers = alloc_comm_buffers(n_global_crosspoints, coupling);
+
+    TIME_SAVE(1);
+
     // get pattern of matrix
     sed* A = sed_nz_pattern(local_mesh);
     if (!A) return(1);
@@ -146,7 +163,6 @@ int main(int argc, char **argv) {
     // }
 
     // Get storage for rhs and solution
-    index n    = A->n;
     // Initialize with zeros
     double* x    = calloc (n, sizeof(double));       // get workspace for sol
     double* b    = calloc (n, sizeof(double));       // get workspace for rhs
@@ -167,6 +183,7 @@ int main(int argc, char **argv) {
     MPI_Bcast(&n_global_crosspoints, 1, MPI_INT, 0, MPI_COMM_WORLD);
     coupling->n_global_cp = n_global_crosspoints;
     comm_buffers* buffers = alloc_comm_buffers(n_global_crosspoints, coupling);
+    TIME_SAVE(21);
 
     index* fixed = local_mesh->fixed;
     index nfixed = local_mesh->nfixed;
@@ -183,13 +200,12 @@ int main(int argc, char **argv) {
     TIME_SAVE(22);
 
     index n_iter;
+
     TIME_SAVE(30);
     if (!strcmp(solver, jacobi)) {
       n_iter = mpi_jacobi(A, coupling, buffers, local_mesh, x, b);
     } else if (!strcmp(solver, gauss_seidel)) {
-      printf("Gauss-Seidel not yet implemented :(\n");
-      MPI_Finalize();
-      return -1;
+      mpi_gs(A, coupling, buffers, local_mesh, x, b);
     } else if (!strcmp(solver, cg)) {
       n_iter = mpi_cg(A, coupling, buffers, local_mesh, x, b);
     } else if (!strcmp(solver, pcg)) {
@@ -210,10 +226,9 @@ int main(int argc, char **argv) {
     MPI_Reduce(&n_iter, &n_iter_min,1,MPI_INT,MPI_MIN,0,MPI_COMM_WORLD);
     MPI_Reduce(&n_iter, &n_iter_sum,1,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
 
-    if (rank==0){
+    if (rank == 0) {
       result_write(
         result_name,
-        nof_p,
         n_rows,
         n_cols,
         refinements,
@@ -223,11 +238,15 @@ int main(int argc, char **argv) {
         n_iter_sum,
         global_mesh->ncoord,
         global_boundaries,
+        n_global_nodes,
+        (int)TIME_ELAPSED(0, 1),
         (int)TIME_ELAPSED(10,11),
         (int)TIME_ELAPSED(20,22),
         (int)TIME_ELAPSED(30,31)
       );
     }
+
+
     // save A, x and b 
     double* global_x = mpi_assemble_t1_vec(coupling, x, n);
     // double* global_rhs = mpi_assemble_t2_vec(coupling, b, n);

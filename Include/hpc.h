@@ -100,8 +100,8 @@ typedef struct coupling_data
       index n_global_cp; // number of global crosspoints
       index n_local_cp; // number of local crosspoints
       index* crossPts; /* crosspoints */
-      index n_v_nodes; // number of interface nodes
-      index* v_nodes; // id's of interface nodes
+      index n_e_nodes; // number of interface nodes
+      index* e_nodes; // id's of interface nodes
       index n_i_nodes; // number of inner nodes
       index* i_nodes;  // ids of inner nodes
       index* l2g; /* local to global node numbering */
@@ -423,6 +423,7 @@ void result_write(
     int n_iter_sum,
     int n_coords,
     index* boundaries,
+    int dt_init,
     int dt_build_S,
     int dt_build_rhs,
     int dt_solve

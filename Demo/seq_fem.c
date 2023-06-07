@@ -42,6 +42,7 @@ int main(int argc, char **argv) {
     char* solver = argv[4];
     char* result_name = argv[5];
 
+    TIME_SAVE(0);
     index boundaries[4] = {1, 0, 0, 0};
     mesh* Mesh = mesh_create_rect(n_rows, n_cols, boundaries, 0.0, 0.0, 1.0, 1.0);
     if(!Mesh) {
@@ -72,7 +73,8 @@ int main(int argc, char **argv) {
                                  Mesh->bdry, 
                                  Mesh->nbdry, 
                                 &Mesh->nfixed);
-
+    TIME_SAVE(1);
+    
     // get pattern of matrix
     sed* A = sed_nz_pattern(Mesh);
     if (!A) return(1);
@@ -139,10 +141,11 @@ int main(int argc, char **argv) {
       n_iter,
       Mesh->ncoord,
       boundaries,
+      (int)TIME_ELAPSED(0, 1),
       (int)TIME_ELAPSED(10,11),
       (int)TIME_ELAPSED(20,22),
       (int)TIME_ELAPSED(30,31)
-      );
+    );
 
     char buf[200];
     sprintf(buf, "../Problem/x_seq_%s", solver);

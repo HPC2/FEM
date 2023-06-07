@@ -6,9 +6,8 @@ ifdef OPENMP
   LDFLAGS += -fopenmp
 endif
 
-ifdef OPT
-  CFLAGS += -O3 -funroll-loops -DNDEBUG # -Wpedantic
-endif
+CFLAGS += -O3 -funroll-loops -DNDEBUG # -Wpedantic
+
 
 CF = $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -O3
 I = -I../Include
