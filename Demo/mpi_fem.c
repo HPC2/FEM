@@ -173,18 +173,6 @@ int main(int argc, char **argv) {
     MPI_Barrier(MPI_COMM_WORLD);
     TIME_SAVE(21);
 
-    // broadcast number of global nodes
-    MPI_Bcast(&n_global_nodes, 1, MPI_AINT, 0, MPI_COMM_WORLD);
-    // create coupling data
-    coupling_data* coupling = mpi_split_interfaces(interfaces, l2g_numbering, n, n_global_nodes);
-
-    // coupling_data_print(coupling, rank);
-    
-    MPI_Bcast(&n_global_crosspoints, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    coupling->n_global_cp = n_global_crosspoints;
-    comm_buffers* buffers = alloc_comm_buffers(n_global_crosspoints, coupling);
-    TIME_SAVE(21);
-
     index* fixed = local_mesh->fixed;
     index nfixed = local_mesh->nfixed;
     double* Coord = local_mesh->coord;
@@ -229,6 +217,7 @@ int main(int argc, char **argv) {
     if (rank == 0) {
       result_write(
         result_name,
+        n_rows*n_cols,
         n_rows,
         n_cols,
         refinements,
@@ -236,9 +225,8 @@ int main(int argc, char **argv) {
         n_iter_max,
         n_iter_min,
         n_iter_sum,
-        global_mesh->ncoord,
-        global_boundaries,
         n_global_nodes,
+        global_boundaries,
         (int)TIME_ELAPSED(0, 1),
         (int)TIME_ELAPSED(10,11),
         (int)TIME_ELAPSED(20,22),

@@ -86,16 +86,16 @@ void coupling_data_print(coupling_data* coupling, int rank){
     // Print header and scalar data
     offset += sprintf(buf+offset,"\n");
     offset += sprintf(buf+offset,"Coupling data (rank=%i)\n", rank);
-    offset += sprintf(buf+offset,"\tn_global_cp\t= %d\n", n_global_cp);
-    offset += sprintf(buf+offset,"\tn_local_cp\t= %d\n", n_local_cp);
-    offset += sprintf(buf+offset,"\tncoupl\t\t= %d\n", ncoupl);
+    offset += sprintf(buf+offset,"\tn_global_cp\t= %td\n", n_global_cp);
+    offset += sprintf(buf+offset,"\tn_local_cp\t= %td\n", n_local_cp);
+    offset += sprintf(buf+offset,"\tncoupl\t\t= %td\n", ncoupl);
 
     // Print cross points
     offset += sprintf(buf+offset,"\tCross points\t= [");
     for (index i=0; i<n_local_cp-1; i++){
         offset += sprintf(buf+offset,"%td, ",crossPts[i]);
     }
-    offset += sprintf(buf+offset,"%d]\n", crossPts[n_local_cp-1]);
+    offset += sprintf(buf+offset,"%td]\n", crossPts[n_local_cp-1]);
 
     // Print coupl
     offset += sprintf(buf+offset,"\tcoupl\t\t= [");

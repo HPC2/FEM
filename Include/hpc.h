@@ -170,6 +170,7 @@ double mpi_dotprod(index n, double* x, double* y);
 index mpi_jacobi(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b);
 index mpi_cg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b);
 index mpi_pcg(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b);
+index mpi_gs(sed* A, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b);
 index seq_gs(sed* A, mesh* Mesh, double* x, double* b);
 index seq_cg(sed* A, mesh* Mesh, double* x, double* b);
 index seq_pcg(sed* A, mesh* Mesh, double* x, double* b);

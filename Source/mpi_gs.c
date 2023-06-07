@@ -1,6 +1,6 @@
 #include "hpc.h"
 
-void mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b) {
+index mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b) {
     
     index n = A_sparse->n;
     index* fixed = local_mesh->fixed;
@@ -133,4 +133,6 @@ void mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh*
             1, w, 1, i_nodes, i_nodes);
         sigma = mpi_dotprod(n, w, resi);
     }
+
+    return 0;
 }
