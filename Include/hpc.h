@@ -17,6 +17,9 @@
 
 // =================== primary HPC routines and data structures ================
 
+extern size_t cp_comm;
+extern size_t if_comm;
+
 typedef struct cs_sparse // matrix in compressed-row/col or triplet form
 {
     index nzmax ;     /* maximum number of entries */
@@ -427,7 +430,9 @@ void result_write(
     int dt_init,
     int dt_build_S,
     int dt_build_rhs,
-    int dt_solve
+    int dt_solve,
+    int cp_comm,
+    int if_comm
 );
 
 #endif

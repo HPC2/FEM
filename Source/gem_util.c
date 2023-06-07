@@ -4,7 +4,10 @@
 gem *gem_alloc(index m, index n, index incRow, index incCol)
 {
     gem *A = (gem*) malloc(sizeof (gem)) ;    /* allocate the gem struct */
-    if (!A) return (NULL) ;                   /* out of memory */
+    if (!A) {
+        printf("OOM!\n");
+        return (NULL) ;                   /* out of memory */
+    } 
 
     // Assign the input values
     A->n      = n ;                         /* define dimensions */
@@ -13,8 +16,11 @@ gem *gem_alloc(index m, index n, index incRow, index incCol)
     A->incCol = incCol ;                         /* col increment*/
 
     // Allocate storage for entries
-    A->x      = (double*) malloc(n*m*sizeof(double)) ;
-    if (!A->x) return (NULL);
+    A->x      = (double*) calloc(n*m, sizeof(double)) ;
+    if (!A->x) {
+        printf("OOM!\n");
+        return (NULL);
+    }
 
     return A;
 }

@@ -1,5 +1,6 @@
 #include "hpc.h"
 #include <mpi.h>
+#include <assert.h>
 
 index mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b) {
     int rank; MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -12,6 +13,11 @@ index mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh
     index incRowA = A->incRow;
     index incColA = A->incCol;
     double* A_data = A->x;
+    // if (rank == 0) {
+    //     for (int i = 0; i < A->m*A->n; i++) {
+    //         assert(A_data[i] == A_data[i]);
+    //     }
+    // }
 
     index n_iter = 0;
 
@@ -22,23 +28,23 @@ index mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh
     index n_e_nodes = coupling->n_e_nodes;
     index n_i_nodes = coupling->n_i_nodes;
 
-    if (rank == 0) {
-        printf("v_nodes:\n");
-        for (int i = 0; i < n_v_nodes; i++) {
-            printf("%td\t", v_nodes[i]);
-        }
-        printf("\n");
-        printf("e_nodes:\n");
-        for (int i = 0; i < n_e_nodes; i++) {
-            printf("%td\t", e_nodes[i]);
-        }
-        printf("\n");
-        printf("i_nodes:\n");
-        for (int i = 0; i < n_i_nodes; i++) {
-            printf("%td\t", i_nodes[i]);
-        }
-        printf("\n");
-    }
+    // if (rank == 0) {
+    //     printf("v_nodes:\n");
+    //     for (int i = 0; i < n_v_nodes; i++) {
+    //         printf("%td\t", v_nodes[i]);
+    //     }
+    //     printf("\n");
+    //     printf("e_nodes:\n");
+    //     for (int i = 0; i < n_e_nodes; i++) {
+    //         printf("%td\t", e_nodes[i]);
+    //     }
+    //     printf("\n");
+    //     printf("i_nodes:\n");
+    //     for (int i = 0; i < n_i_nodes; i++) {
+    //         printf("%td\t", i_nodes[i]);
+    //     }
+    //     printf("\n");
+    // }
     
     double omega = 0.2;
 
@@ -49,6 +55,9 @@ index mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh
     
 
     double* d = accumulate_inv_diag(coupling, A_sparse, buffers);
+    for ( size_t i = 0; i < nfixed; ++i){
+        d[fixed[i]] = 0;
+    }
     dscal(n, omega, d, 1);
     // resi <-- b
     dcopy(n, b, 1, resi, 1);
@@ -63,12 +72,30 @@ index mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh
     double sigma = mpi_dotprod(n, w, resi);
     double sigma0 = sigma;
 
+    // if (rank == 0) {
+    //         
+    //     printf("x:\n");
+    //     for (int i = 0; i < n; i++) {
+    //         printf("%4.4lf\t",x[i]);
+    //     }
+    //     printf("\n");
+    // }
 
-    while (sigma > tol*sigma0 && n_iter < 100) {
+
+    while (sigma > tol*sigma0) {
         n_iter++;
         // resi_v <- b_v
         indexed_dcopy(n_v_nodes, b, 1, resi, 1, v_nodes);
-        
+
+        // if (rank == 0) {
+// 
+        //     printf("resi:\n");
+        //     for (int i = 0; i < n; i++) {
+        //         printf("%4.4lf\t",resi[i]);
+        //     }
+        //     printf("\n");
+        // }
+        // dcopy(n, b, 1, resi, 1);
         // v nodes
         // resi_v = resi_v - A_v*x_v
         indexed_dgemv(n_v_nodes, n_v_nodes,
@@ -91,9 +118,27 @@ index mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh
             resi[fixed[i]] = 0;
         }
 
+        //if (rank == 0) {
+
+        //    printf("resi:\n");
+        //    for (int i = 0; i < n; i++) {
+        //        printf("%4.4lf\t",resi[i]);
+        //    }
+        //    printf("\n");
+        //}
+
         // w_v = accumulate(resi_v)
         indexed_dcopy(n_v_nodes, resi, 1, w, 1, v_nodes);
         mpi_sum_crosspoints(coupling, w, buffers->cp_buffer);
+
+        //if (rank == 0) {
+//
+        //    printf("w:\n");
+        //    for (int i = 0; i < n; i++) {
+        //        printf("%4.4lf\t",w[i]);
+        //    }
+        //    printf("\n");
+        //}  
         
         // copy w_v to s_v 
         indexed_dcopy(n_v_nodes, w, 1, s, 1, v_nodes);
@@ -102,6 +147,16 @@ index mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh
         // x <- x + s
         indexed_daxpy(n_v_nodes, 1, s, 1, x, 1, v_nodes);
 
+        // if (rank == 0) {
+// 
+        //     printf("x:\n");
+        //     for (int i = 0; i < n; i++) {
+        //         printf("%4.4lf\t",x[i]);
+        //     }
+        //     printf("\n");
+        // }  
+
+        indexed_dcopy(n_e_nodes, b, 1, resi, 1, e_nodes);
         // e nodes
         indexed_dgemv(n_e_nodes, n_v_nodes,
             -1, A_data, incRowA, incColA,
@@ -130,6 +185,7 @@ index mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh
 
 
         // i nodes 
+        indexed_dcopy(n_i_nodes, b, 1, resi, 1, i_nodes);
         indexed_dgemv(n_i_nodes, n_v_nodes,
             -1, A_data, incRowA, incColA,
             x, 1,
@@ -142,7 +198,16 @@ index mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh
         // set fixed nodes back to zero
         for ( index i = 0; i < nfixed; ++i){
             resi[fixed[i]] = 0;
-        }  
+        }
+
+        // if (rank == 0) {
+        // 
+        //     printf("resi:\n");
+        //     for (int i = 0; i < n; i++) {
+        //         printf("%4.4lf\t",resi[i]);
+        //     }
+        //     printf("\n");
+        // }  
 
         // gauss-seidel step
         for (index i = 0; i < n_i_nodes; i++) {
@@ -154,16 +219,10 @@ index mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh
             }
             x[i_nodes[i]] += d[i_nodes[i]] * dx;
         }
-        double* global_x = mpi_assemble_t1_vec(coupling, x, n);
-        if (rank == 0) {
-            
-            printf("x:\n");
-            for (int i = 0; i < coupling->n_global_nodes; i++) {
-                printf("%4.4lf\t", global_x[i]);
-            }
-            printf("\n");
-        }
-        free(global_x);
+
+        //double* global_x = mpi_assemble_t1_vec(coupling, x, n);
+        
+        //free(global_x);
 
         // end gauss-seidel
         indexed_dcopy(n_i_nodes, resi, 1, w, 1, i_nodes);
@@ -171,13 +230,16 @@ index mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh
             -1, A_data, incRowA, incColA,
             x, 1,
             1, w, 1, i_nodes, i_nodes);
-
+        
+        // set fixed nodes back to zero
         for ( index i = 0; i < nfixed; ++i){
             w[fixed[i]] = 0;
         }  
-        
+
         sigma = mpi_dotprod(n, w, resi);
     }
+
+    // printf("%d: %td\n", rank, n_iter);
 
     return n_iter;
 }

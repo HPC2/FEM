@@ -24,7 +24,9 @@ void result_write(
     int dt_init,
     int dt_build_S,
     int dt_build_rhs,
-    int dt_solve
+    int dt_solve,
+    int t_cp_comm,
+    int t_if_comm
     ){
     char filename[200];
     sprintf(filename, "../Result/result_%s.csv",result_name);
@@ -50,7 +52,7 @@ void result_write(
         fprintf (f,"glob_b3\n");
         
     }
-    fprintf(f,"%i,%i,%i,%s,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\n",
+    fprintf(f,"%i,%i,%i,%s,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%td,%td,%td,%td\n",
       n_rows,
       n_cols,
       n_refs,
@@ -64,6 +66,8 @@ void result_write(
       dt_build_S,
       dt_build_rhs,
       dt_solve,
+      t_cp_comm,
+      t_if_comm,
       boundaries[0],
       boundaries[1],
       boundaries[2],

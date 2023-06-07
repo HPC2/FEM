@@ -2,6 +2,7 @@
 #include <mpi.h>
 
 void mpi_sum_crosspoints(coupling_data* coupling, double* x, double* cp_buffer) {
+    struct timeval t0; gettimeofday(&t0, (struct timezone*)0);
     index n_cp = coupling -> n_local_cp;
     index n_g_cp = coupling->n_global_cp;
     index* cp = coupling -> crossPts;
@@ -16,11 +17,13 @@ void mpi_sum_crosspoints(coupling_data* coupling, double* x, double* cp_buffer) 
     for (index i = 0; i < n_cp; i++) {
         x[cp[i]] = cp_buffer[l2g[cp[i]]];
     }
+    struct timeval t1; gettimeofday(&t1, (struct timezone*)0);
+    cp_comm += (size_t) (1.E+6*(t1.tv_sec-t0.tv_sec)+(t1.tv_usec-t0.tv_usec));
 }
 
 void mpi_sum_interfaces(coupling_data* coupling, double* x, double* if_buffer_send, double* if_buffer_recv) {
     int rank; MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
+    struct timeval t0; gettimeofday(&t0, (struct timezone*)0);
     for(int i=0; i<4; i++) { // iterate through all 4 colors
         index left  = coupling->coupl_sorted[5*i+2];
         index right = coupling->coupl_sorted[5*i+3];
@@ -57,6 +60,8 @@ void mpi_sum_interfaces(coupling_data* coupling, double* x, double* if_buffer_se
                 x[if_nodes[j]] += if_buffer_recv[j]; // accumulating
             }
         }
+        struct timeval t1; gettimeofday(&t1, (struct timezone*)0);
+        if_comm += (size_t) (1.E+6*(t1.tv_sec-t0.tv_sec)+(t1.tv_usec-t0.tv_usec));
     }
 }
 

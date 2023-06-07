@@ -29,6 +29,8 @@ struct timeval tv[100];
 #define TIME_SAVE(j)   (gettimeofday(&tv[j], (struct timezone*)0))
 #define TIME_ELAPSED(j,k)	(1.E+6*(tv[k].tv_sec-tv[j].tv_sec)+(tv[k].tv_usec-tv[j].tv_usec))
 
+size_t cp_comm;
+size_t if_comm;
 
 char* jacobi = "jacobi";
 char* gauss_seidel = "gs";
@@ -128,8 +130,16 @@ int main(int argc, char **argv) {
     mesh* local_mesh = mesh_create_rect(1, 1, boundaries, offset_x, offset_y, size_x, size_y);
     local_mesh = mesh_multi_refine(local_mesh, refinements);
 
+    if (rank == 0) {
+      mesh_write(local_mesh, "../Problem/before");
+    }
+
     if (!strcmp(solver, gauss_seidel)) {
       mesh_flip_edge(local_mesh);
+    }
+
+    if (rank == 0) {
+      mesh_write(local_mesh, "../Problem/after");
     }
 
     local_mesh->fixed = mesh_getFixed( local_mesh->ncoord, 
@@ -193,12 +203,14 @@ int main(int argc, char **argv) {
     TIME_SAVE(22);
 
     index n_iter;
+    cp_comm = 0;
+    if_comm = 0;
 
     TIME_SAVE(30);
     if (!strcmp(solver, jacobi)) {
       n_iter = mpi_jacobi(A, coupling, buffers, local_mesh, x, b);
     } else if (!strcmp(solver, gauss_seidel)) {
-      mpi_gs(A, coupling, buffers, local_mesh, x, b);
+      n_iter = mpi_gs(A, coupling, buffers, local_mesh, x, b);
     } else if (!strcmp(solver, cg)) {
       n_iter = mpi_cg(A, coupling, buffers, local_mesh, x, b);
     } else if (!strcmp(solver, pcg)) {
@@ -215,11 +227,14 @@ int main(int argc, char **argv) {
     index n_iter_max=0;
     index n_iter_min=0;
     index n_iter_sum=0;
-    MPI_Reduce(&n_iter, &n_iter_max,1,MPI_INT,MPI_MAX,0,MPI_COMM_WORLD);
-    MPI_Reduce(&n_iter, &n_iter_min,1,MPI_INT,MPI_MIN,0,MPI_COMM_WORLD);
-    MPI_Reduce(&n_iter, &n_iter_sum,1,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
+    size_t if_comm_mean = 0;
+    MPI_Reduce(&n_iter, &n_iter_max,1,MPI_AINT,MPI_MAX,0,MPI_COMM_WORLD);
+    MPI_Reduce(&n_iter, &n_iter_min,1,MPI_AINT,MPI_MIN,0,MPI_COMM_WORLD);
+    MPI_Reduce(&n_iter, &n_iter_sum,1,MPI_AINT,MPI_SUM,0,MPI_COMM_WORLD);
+    MPI_Reduce(&if_comm, &if_comm_mean, 1, MPI_AINT, MPI_SUM, 0, MPI_COMM_WORLD);
 
     if (rank == 0) {
+      if_comm_mean /= nof_p;
       result_write(
         result_name,
         n_rows*n_cols,
@@ -235,19 +250,21 @@ int main(int argc, char **argv) {
         (int)TIME_ELAPSED(0, 1),
         (int)TIME_ELAPSED(10,11),
         (int)TIME_ELAPSED(20,22),
-        (int)TIME_ELAPSED(30,31)
+        (int)TIME_ELAPSED(30,31),
+        (int) cp_comm,
+        (int) if_comm_mean
       );
     }
 
 
     // save A, x and b 
-    //double* global_x = mpi_assemble_t1_vec(coupling, x, n);
+    double* global_x = mpi_assemble_t1_vec(coupling, x, n);
     // double* global_rhs = mpi_assemble_t2_vec(coupling, b, n);
     // double* global_A   = mpi_assemble_A(A, coupling);
     if (rank == 0) {
-        //char buf[200];
-        //sprintf(buf, "../Problem/x_mpi_%s", solver);
-        //print_dmatrix(global_x, n_global_nodes, 1, false, buf, "dat");
+        char buf[200];
+        sprintf(buf, "../Problem/x_mpi_%s", solver);
+        print_dmatrix(global_x, n_global_nodes, 1, false, buf, "dat");
         // print_dmatrix(global_rhs, n_global_nodes, 1, false, "../Problem/b-test", "dat");
         // print_dmatrix(global_A, n_global_nodes, n_global_nodes, true, "../Problem/A-test", "dat");
     }
