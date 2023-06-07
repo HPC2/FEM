@@ -241,13 +241,13 @@ int main(int argc, char **argv) {
 
 
     // save A, x and b 
-    double* global_x = mpi_assemble_t1_vec(coupling, x, n);
+    //double* global_x = mpi_assemble_t1_vec(coupling, x, n);
     // double* global_rhs = mpi_assemble_t2_vec(coupling, b, n);
     // double* global_A   = mpi_assemble_A(A, coupling);
     if (rank == 0) {
-        char buf[200];
-        sprintf(buf, "../Problem/x_mpi_%s", solver);
-        print_dmatrix(global_x, n_global_nodes, 1, false, buf, "dat");
+        //char buf[200];
+        //sprintf(buf, "../Problem/x_mpi_%s", solver);
+        //print_dmatrix(global_x, n_global_nodes, 1, false, buf, "dat");
         // print_dmatrix(global_rhs, n_global_nodes, 1, false, "../Problem/b-test", "dat");
         // print_dmatrix(global_A, n_global_nodes, n_global_nodes, true, "../Problem/A-test", "dat");
     }

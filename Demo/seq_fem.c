@@ -150,10 +150,10 @@ int main(int argc, char **argv) {
       (int)TIME_ELAPSED(30,31)
     );
 
-    char buf[200];
-    sprintf(buf, "../Problem/x_seq_%s", solver);
+    //char buf[200];
+    //sprintf(buf, "../Problem/x_seq_%s", solver);
 
-    print_dmatrix(x, n, 1, false, buf, "dat");
+    //print_dmatrix(x, n, 1, false, buf, "dat");
     
     // print_dmatrix(b, n, 1, false, "../Problem/b", "dat"); 
     // gem* A_full = sed_to_dense(A, true);
