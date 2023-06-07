@@ -41,8 +41,73 @@ make mpi > /dev/null
 echo "make seq"
 make seq > /dev/null
 
-# --- GLOBALS
-RESULT_NAME="first_experiment"
+RESULT_NAME="name"
+declare -a SOLVER=(
+    "jacobi"
+    "cg"
+    "pcg"
+)
+for s in "${SOLVER[@]}";do
+    # MPI 4x3
+    hostfile 0 0 0 0 0 0 0 12
+    run_experiment 30 50 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 0 $s $RESULT_NAME"
+    run_experiment 30 50 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 1 $s $RESULT_NAME"
+    run_experiment 30 50 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 2 $s $RESULT_NAME"
+    run_experiment 30 50 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 3 $s $RESULT_NAME"
+    run_experiment 5 20 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 4 $s $RESULT_NAME"
+    run_experiment 5 20 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 5 $s $RESULT_NAME"
+    run_experiment 0 20 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 6 $s $RESULT_NAME"
+    run_experiment 0 5 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 7 $s $RESULT_NAME"
+    # MPI 12x1
+    hostfile 0 0 0 0 0 0 0 12
+    run_experiment 30 50 "mpirun -np 12 --hostfile hostfile mpi_fem 12 1 0 $s $RESULT_NAME"
+    run_experiment 30 50 "mpirun -np 12 --hostfile hostfile mpi_fem 12 1 1 $s $RESULT_NAME"
+    run_experiment 30 50 "mpirun -np 12 --hostfile hostfile mpi_fem 12 1 2 $s $RESULT_NAME"
+    run_experiment 30 50 "mpirun -np 12 --hostfile hostfile mpi_fem 12 1 3 $s $RESULT_NAME"
+    run_experiment 5 20 "mpirun -np 12 --hostfile hostfile mpi_fem 12 1 4 $s $RESULT_NAME"
+    run_experiment 5 20 "mpirun -np 12 --hostfile hostfile mpi_fem 12 1 5 $s $RESULT_NAME"
+    run_experiment 0 20 "mpirun -np 12 --hostfile hostfile mpi_fem 12 1 6 $s $RESULT_NAME"
+    run_experiment 0 5 "mpirun -np 12 --hostfile hostfile mpi_fem 12 1 7 $s $RESULT_NAME"
+    # SEQ 4x3
+    run_experiment 30 50 "./seq_fem 4 3 0 $s $RESULT_NAME"
+    run_experiment 30 50 "./seq_fem 4 3 1 $s $RESULT_NAME"
+    run_experiment 30 50 "./seq_fem 4 3 2 $s $RESULT_NAME"
+    run_experiment 30 50 "./seq_fem 4 3 3 $s $RESULT_NAME"
+    run_experiment 5 20 "./seq_fem 4 3 4 $s $RESULT_NAME"
+    run_experiment 5 20 "./seq_fem 4 3 5 $s $RESULT_NAME"
+    run_experiment 0 20 "./seq_fem 4 3 6 $s $RESULT_NAME"
+    run_experiment 0 5 "./seq_fem 4 3 7 $s $RESULT_NAME"
+    # SEQ 1x1
+    run_experiment 5 20 "./seq_fem 1 1 4 $s $RESULT_NAME"
+    run_experiment 5 20 "./seq_fem 1 1 5 $s $RESULT_NAME"
+    run_experiment 0 20 "./seq_fem 1 1 6 $s $RESULT_NAME"
+    run_experiment 0 5 "./seq_fem 1 1 7 $s $RESULT_NAME"
+    # MPI 2x2
+    hostfile 0 0 0 0 0 0 0 4
+    run_experiment 30 50 "mpirun -np 4 --hostfile hostfile mpi_fem 2 2 3 $s $RESULT_NAME"
+    run_experiment 5 20 "mpirun -np 4 --hostfile hostfile mpi_fem 2 2 4 $s $RESULT_NAME"
+    run_experiment 5 20 "mpirun -np 4 --hostfile hostfile mpi_fem 2 2 5 $s $RESULT_NAME"
+    run_experiment 0 20 "mpirun -np 4 --hostfile hostfile mpi_fem 2 2 6 $s $RESULT_NAME"
+    # MPI 4x4
+    hostfile 0 0 0 0 0 0 8 8
+    run_experiment 30 50 "mpirun -np 16 --hostfile hostfile mpi_fem 4 4 2 $s $RESULT_NAME"
+    run_experiment 30 50 "mpirun -np 16 --hostfile hostfile mpi_fem 4 4 3 $s $RESULT_NAME"
+    run_experiment 5 20 "mpirun -np 16 --hostfile hostfile mpi_fem 4 4 4 $s $RESULT_NAME"
+    run_experiment 5 20 "mpirun -np 16 --hostfile hostfile mpi_fem 4 4 5 $s $RESULT_NAME"
+    # MPI 8x8
+    hostfile 8 8 8 8 8 8 8 8
+    run_experiment 30 50 "mpirun -np 64 --hostfile hostfile mpi_fem 8 8 1 $s $RESULT_NAME"
+    run_experiment 30 50 "mpirun -np 64 --hostfile hostfile mpi_fem 8 8 2 $s $RESULT_NAME"
+    run_experiment 30 50 "mpirun -np 64 --hostfile hostfile mpi_fem 8 8 3 $s $RESULT_NAME"
+    run_experiment 5 20 "mpirun -np 64 --hostfile hostfile mpi_fem 8 8 4 $s $RESULT_NAME"
+done
+
+exit 0
+
+
+
+
+
 
 declare -a SEQ_SOLVER=(
     "jacobi"
@@ -56,26 +121,6 @@ declare -a MPI_SOLVER=(
     "pcg"
 )
 
-#---------- MPI PROBLEMS -----
-declare -a MPI_DOMAINS=(
-    "4 3"
-)
-
-for dom in "${MPI_DOMAINS[@]}";do
-    N_PROCESSORS="$((${dom// /*}))"
-    hostfile 0 0 0 0 0 0 0 $N_PROCESSORS
-    for solver in "${MPI_SOLVER[@]}";do
-        for refs in 0 1 2 3;do
-            run_experiment 10 20 "mpirun -np $N_PROCESSORS --hostfile hostfile mpi_fem $dom $refs $solver $RESULT_NAME"
-        done
-        for refs in 4 5;do
-            run_experiment 2 10 "mpirun -np $N_PROCESSORS --hostfile hostfile mpi_fem $dom $refs $solver $RESULT_NAME"
-        done
-        for refs in 6 7;do
-            run_experiment 0 5 "mpirun -np $N_PROCESSORS --hostfile hostfile mpi_fem $dom $refs $solver $RESULT_NAME"
-        done
-    done
-done
 
 #---------- SEQ PROBLEMS -----
 declare -a SEQ_DOMAINS=(
@@ -90,8 +135,30 @@ for dom in "${SEQ_DOMAINS[@]}";do
         for refs in 4 5;do
             run_experiment 2 10 "./seq_fem $dom $refs $solver $RESULT_NAME"
         done
-        for refs in 6 7;do
-            run_experiment 0 5 "./seq_fem $dom $refs $solver $RESULT_NAME"
+        #for refs in 6 7;do
+        #    run_experiment 0 5 "./seq_fem $dom $refs $solver $RESULT_NAME"
+        #done
+    done
+done
+
+
+#---------- MPI PROBLEMS -----
+declare -a MPI_DOMAINS=(
+    "4 3"
+)
+
+for dom in "${MPI_DOMAINS[@]}";do
+    N_PROCESSORS="$((${dom// /*}))"
+    hostfile 0 0 0 0 0 0 0 $N_PROCESSORS
+    for solver in "${MPI_SOLVER[@]}";do
+        for refs in 0 1 2 3;do
+            run_experiment 10 20 "mpirun -q -np $N_PROCESSORS --hostfile hostfile mpi_fem $dom $refs $solver $RESULT_NAME"
         done
+        for refs in 4 5;do
+            run_experiment 2 10 "mpirun -np $N_PROCESSORS --hostfile hostfile mpi_fem $dom $refs $solver $RESULT_NAME"
+        done
+        #for refs in 6 7;do
+        #    run_experiment 0 5 "mpirun -np $N_PROCESSORS --hostfile hostfile mpi_fem $dom $refs $solver $RESULT_NAME"
+        #done
     done
 done
