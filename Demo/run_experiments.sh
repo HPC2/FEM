@@ -1,5 +1,13 @@
 #!/bin/bash
 
+sigterm_handler() { 
+  echo "Shutdown signal received."
+  exit 1
+}
+
+## Setup signal trap
+trap 'trap " " SIGINT SIGTERM SIGHUP; kill 0; wait; sigterm_handler' SIGINT SIGTERM SIGHUP
+
 function run_experiment() {
     WARMUPS=$1
     RUNS=$2
