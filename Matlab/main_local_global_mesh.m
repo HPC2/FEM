@@ -2,10 +2,11 @@ clear
 close all
 
 % Set vars
-n_rows = 3;
-n_cols = 3;
-n_refs = 3;
-process_id_under_investigation = 6;
+n_rows = 2;
+n_cols = 2;
+n_refs = 1;
+
+process_id_under_investigation = 3;
 
 % Build file name
 fname = "rectangle_%ix%i_global_%iref";
@@ -55,15 +56,16 @@ nodes_local_ref_off = nodes_local_ref + local_offset';
 nodes_local_no_ref_off = nodes_local_no_ref + local_offset';
 
 % Plot
-figure();
+tiledlayout(1,1, 'Padding', 'none', 'TileSpacing', 'compact'); 
+nexttile
 
 hpc_plot.plot_skeleton(elements_global_ref, nodes_global_ref, "color", "#999999");
 hpc_plot.plot_skeleton(elements_local_no_ref, nodes_local_no_ref_off, "linewidth", 2);
 
 hpc_plot.mark_nodes(nodes_global_ref);
 
-hpc_plot.label_nodes(elements_global_ref, nodes_global_ref, "x_offset", 0.01, "y_offset", 0.01, "color", "r", "label", "N_G");
-hpc_plot.label_nodes(elements_local_ref, nodes_local_ref_off, "x_offset", 0.01, "y_offset", -0.01, "color", "b", "label", "N_L");
+hpc_plot.label_nodes(elements_global_ref, nodes_global_ref, "x_offset", 0.032, "y_offset", 0.02, "color", "r", "label", "N_G");
+hpc_plot.label_nodes(elements_local_ref, nodes_local_ref_off, "x_offset", 0.032, "y_offset", -0.03, "color", "b", "label", "N_L");
 
 hpc_plot.label_l2g(l2g(process_id_under_investigation+1,:),nodes_global_ref);
 

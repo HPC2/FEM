@@ -40,7 +40,7 @@ void result_write(
         fprintf (f,"n_iter_sum,");
         fprintf (f,"n_processors,");
         fprintf (f,"n_coords,");
-        fprintf (f,"dt_init");
+        fprintf (f,"dt_init,");
         fprintf (f,"dt_build_S,");
         fprintf (f,"dt_build_rhs,");
         fprintf (f,"dt_solve,");
