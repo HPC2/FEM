@@ -69,7 +69,7 @@ index mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh
         for ( index i = 0; i < nfixed; ++i){
             s[fixed[i]] = 0;
         }
-        return;
+        return 0;
         indexed_daxpy(n_v_nodes, 1, s, 1, x, 1, v_nodes);
 
         
