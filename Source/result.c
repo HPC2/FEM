@@ -46,6 +46,8 @@ void result_write(
         fprintf (f,"dt_build_S,");
         fprintf (f,"dt_build_rhs,");
         fprintf (f,"dt_solve,");
+        fprintf (f,"t_cp_comm,");
+        fprintf (f,"t_if_comm,");
         fprintf (f,"glob_b0,");
         fprintf (f,"glob_b1,");
         fprintf (f,"glob_b2,");
