@@ -24,7 +24,7 @@ classdef Result < handle
         function settings = experiment_catalog(obj)
             all_settings = obj.data(:,["n_rows","n_cols","n_refs","solver","n_processors"]);
             [settings,~,affiliation] = unique(all_settings,"rows");
-            settings.count=histcounts(affiliation)';
+            settings.count=histcounts(affiliation,"BinMethod","integers")';
         end
     end
 end
