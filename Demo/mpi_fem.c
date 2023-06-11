@@ -224,14 +224,14 @@ int main(int argc, char **argv) {
     index n_iter_max=0;
     index n_iter_min=0;
     index n_iter_sum=0;
-    size_t if_comm_mean = 0;
+    // size_t if_comm_mean = 0;
     MPI_Reduce(&n_iter, &n_iter_max,1,MPI_AINT,MPI_MAX,0,MPI_COMM_WORLD);
     MPI_Reduce(&n_iter, &n_iter_min,1,MPI_AINT,MPI_MIN,0,MPI_COMM_WORLD);
     MPI_Reduce(&n_iter, &n_iter_sum,1,MPI_AINT,MPI_SUM,0,MPI_COMM_WORLD);
-    MPI_Reduce(&if_comm, &if_comm_mean, 1, MPI_AINT, MPI_SUM, 0, MPI_COMM_WORLD);
+    // MPI_Reduce(&if_comm, &if_comm_mean, 1, MPI_AINT, MPI_SUM, 0, MPI_COMM_WORLD);
 
     if (rank == 0) {
-      if_comm_mean /= nof_p;
+      // if_comm_mean /= nof_p;
       result_write(
         result_name,
         n_rows*n_cols,
@@ -244,12 +244,12 @@ int main(int argc, char **argv) {
         n_iter_sum,
         n_global_nodes,
         global_boundaries,
-        (int)TIME_ELAPSED(0, 1),
-        (int)TIME_ELAPSED(10,11),
-        (int)TIME_ELAPSED(20,22),
-        (int)TIME_ELAPSED(30,31),
-        (int) cp_comm,
-        (int) if_comm_mean
+        (size_t)TIME_ELAPSED(0, 1),
+        (size_t)TIME_ELAPSED(10,11),
+        (size_t)TIME_ELAPSED(20,22),
+        (size_t)TIME_ELAPSED(30,31),
+        (size_t) cp_comm,
+        (size_t) if_comm
       );
     }
 

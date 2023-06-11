@@ -21,12 +21,12 @@ void result_write(
     int n_iter_sum,
     int n_coords,
     index* boundaries,
-    int dt_init,
-    int dt_build_S,
-    int dt_build_rhs,
-    int dt_solve,
-    int t_cp_comm,
-    int t_if_comm
+    size_t dt_init,
+    size_t dt_build_S,
+    size_t dt_build_rhs,
+    size_t dt_solve,
+    size_t t_cp_comm,
+    size_t t_if_comm
     ){
     char filename[200];
     sprintf(filename, "../Result/result_%s.csv",result_name);
@@ -54,7 +54,7 @@ void result_write(
         fprintf (f,"glob_b3\n");
         
     }
-    fprintf(f,"%i,%i,%i,%s,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%td,%td,%td,%td\n",
+    fprintf(f,"%i,%i,%i,%s,%i,%i,%i,%i,%i,%zu,%zu,%zu,%zu,%zu,%zu,%td,%td,%td,%td\n",
       n_rows,
       n_cols,
       n_refs,

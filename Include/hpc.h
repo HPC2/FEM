@@ -429,12 +429,12 @@ void result_write(
     int n_iter_sum,
     int n_coords,
     index* boundaries,
-    int dt_init,
-    int dt_build_S,
-    int dt_build_rhs,
-    int dt_solve,
-    int cp_comm,
-    int if_comm
+    size_t dt_init,
+    size_t dt_build_S,
+    size_t dt_build_rhs,
+    size_t dt_solve,
+    size_t cp_comm,
+    size_t if_comm
 );
 
 #endif
