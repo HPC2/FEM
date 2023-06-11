@@ -112,14 +112,14 @@ done
 hostfile 0 0 0 0 0 0 0 12
 run_experiment 30 50 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 1 gs $RESULT_NAME"
 run_experiment 10 30 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 2 gs $RESULT_NAME"
-run_experiment $warmup_high 15 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 3 gs $RESULT_NAME"
-run_experiment $warmup_low 15 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 4 gs $RESULT_NAME"
+run_experiment 5 15 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 3 gs $RESULT_NAME"
+run_experiment 0 15 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 4 gs $RESULT_NAME"
 
 run_experiment 30 50 "./seq_fem 4 3 0 gs $RESULT_NAME"
 run_experiment 30 50 "./seq_fem 4 3 1 gs $RESULT_NAME"
-run_experiment $warmup_high 30 "./seq_fem 4 3 2 gs $RESULT_NAME"
-run_experiment $warmup_high 15 "./seq_fem 4 3 3 gs $RESULT_NAME"
-run_experiment $warmup_low 15 "./seq_fem 4 3 4 gs $RESULT_NAME"
+run_experiment 5 30 "./seq_fem 4 3 2 gs $RESULT_NAME"
+run_experiment 5 15 "./seq_fem 4 3 3 gs $RESULT_NAME"
+run_experiment 0 15 "./seq_fem 4 3 4 gs $RESULT_NAME"
 
 exit 0
 
