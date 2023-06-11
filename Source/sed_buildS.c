@@ -164,3 +164,122 @@ index sed_buildS(mesh *M, sed *T)
     }
     return(1);
 }
+
+
+void i_swap(index* xp, index* yp)
+{
+    index temp = *xp;
+    *xp = *yp;
+    *yp = temp;
+}
+
+void d_swap(double* xp, double* yp)
+{
+    double temp = *xp;
+    *xp = *yp;
+    *yp = temp;
+}
+
+void bubbleSort(index* arr, double* data, int n)
+{
+    index i, j;
+    bool swapped;
+    for (i = 0; i < n - 1; i++) {
+        swapped = false;
+        for (j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                i_swap(&arr[j], &arr[j + 1]);
+                d_swap(&data[j], &data[j + 1]);
+                swapped = true;
+            }
+        }
+        if (swapped == false)
+            break;
+    }
+}
+
+sed* symmetrize_sed(sed* A) {
+    double* Ax = A->x;
+    index* Ai = A->i;
+    index n = A->n;
+
+    index* n_cols = calloc(n, sizeof(index));
+
+    sed* B = malloc(sizeof(sed));
+
+    for (int i = 0; i < n; i++) {
+        for(int p = Ai[i]; p < Ai[i+1]; p++) {
+            if (Ax[p] != 0) {
+                n_cols[Ai[p]]++;
+                n_cols[i]++;
+            }
+            // printf("%td:%1.2lf\t", Ai[p], Ax[p]);
+            
+        }
+        // printf("\n");
+    }
+
+    index* cumsum = calloc(n+1, sizeof(index));
+
+    for (int i = 0; i < n; i++) {
+        cumsum[i+1] = cumsum[i] + n_cols[i];
+    }
+
+    // for (int i = 0; i < n; i++) {
+    //     printf("%td\t%td\n", n_cols[i], cumsum[i+1]);
+    // }
+    // printf("\n");
+
+    B->x = calloc(n+1+cumsum[n], sizeof(double));
+    B->i = calloc(n+1+cumsum[n], sizeof(double));
+    double* Bx = B->x;
+    index* Bi = B->i;
+    for (int i = 0; i < n+1; i++) {
+        Bx[i] = Ax[i];
+        Bi[i] = n+1+cumsum[i];
+    }
+
+    // for (int i = 0; i < n+1; i++) {
+    //     printf("%d\t%1.1lf\t%td\n", i, Bx[i], Bi[i]);
+    // }
+
+    index* buf = calloc(n, sizeof(index));
+
+    for (int i = 0; i < n; i++) {
+        for(int p = Ai[i]; p < Ai[i+1]; p++) {
+            if (Ax[p] != 0) {
+                Bx[Bi[i] + buf[i]] = Ax[p];
+                Bi[Bi[i] + buf[i]] = Ai[p];
+                buf[i]++;
+                
+                index j = Ai[p];
+                // printf("j: %td\n", j);
+                Bx[Bi[j] + buf[j]] = Ax[p];
+                Bi[Bi[j] + buf[j]] = i;
+                buf[j]++;
+            }
+            
+        }
+    }
+
+
+    for (int i = 0; i < n; i++) {
+        int p = Bi[i];
+        bubbleSort(&Bi[p], &Bx[p], Bi[i+1]-p);
+    }
+    B->n = n;
+    B->nzmax = (A->nzmax - n) * 2 + n;
+
+    // for (int i = 0;  i < n + 1 + cumsum[n]; i++) {
+    //     printf("%1.2lf\t%td\n", Bx[i], Bi[i]);
+    // }
+    // printf("\n");
+
+    // gem* B_full = sed_to_dense(B, false);
+    // double* B_data = B_full->x;
+    // print_dmatrix(B_data, n,n, true, "../Problem/B_sym", "dat");
+
+    sed_free(A);
+
+    return B;
+}

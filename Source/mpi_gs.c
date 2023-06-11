@@ -1,18 +1,13 @@
 #include "hpc.h"
-#include <mpi.h>
-#include <assert.h>
 
 index mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh* local_mesh, double* x, double* b) {
-    int rank; MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     index n = A_sparse->n;
+    double* Ax = A_sparse->x;
+    index* Ai = A_sparse->i;
     index* fixed = local_mesh->fixed;
     index nfixed = local_mesh->nfixed;
     double tol = 1e-8;
-    gem* A = sed_to_dense(A_sparse, true);
-    index incRowA = A->incRow;
-    index incColA = A->incCol;
-    double* A_data = A->x;
     // if (rank == 0) {
     //     for (int i = 0; i < A->m*A->n; i++) {
     //         assert(A_data[i] == A_data[i]);
@@ -98,18 +93,18 @@ index mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh
         // dcopy(n, b, 1, resi, 1);
         // v nodes
         // resi_v = resi_v - A_v*x_v
-        indexed_dgemv(n_v_nodes, n_v_nodes,
-            -1, A_data, incRowA, incColA,
+        indexed_sysed_spmv(n_v_nodes, n_v_nodes,
+            -1, A_sparse,
             x, 1,
             1, resi, 1, v_nodes, v_nodes);
         // resi_v = resi_v - A_ve*x_e
-        indexed_dgemv(n_v_nodes, n_e_nodes,
-            -1, A_data, incRowA, incColA,
+        indexed_sysed_spmv(n_v_nodes, n_e_nodes,
+            -1, A_sparse,
             x, 1,
             1, resi, 1, e_nodes, v_nodes);
         // resi_v = resi_v - A_vi*x_i
-        indexed_dgemv(n_v_nodes, n_i_nodes,
-            -1, A_data, incRowA, incColA,
+        indexed_sysed_spmv(n_v_nodes, n_i_nodes,
+            -1, A_sparse,
             x, 1,
             1, resi, 1, i_nodes, v_nodes);
 
@@ -158,16 +153,16 @@ index mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh
 
         indexed_dcopy(n_e_nodes, b, 1, resi, 1, e_nodes);
         // e nodes
-        indexed_dgemv(n_e_nodes, n_v_nodes,
-            -1, A_data, incRowA, incColA,
+        indexed_sysed_spmv(n_e_nodes, n_v_nodes,
+            -1, A_sparse,
             x, 1,
             1, resi, 1, v_nodes, e_nodes);
-        indexed_dgemv(n_e_nodes, n_e_nodes,
-            -1, A_data, incRowA, incColA,
+        indexed_sysed_spmv(n_e_nodes, n_e_nodes,
+            -1, A_sparse,
             x, 1,
             1, resi, 1, e_nodes, e_nodes);
-        indexed_dgemv(n_e_nodes, n_i_nodes,
-            -1, A_data, incRowA, incColA,
+        indexed_sysed_spmv(n_e_nodes, n_i_nodes,
+            -1, A_sparse,
             x, 1,
             1, resi, 1, i_nodes, e_nodes);
 
@@ -186,12 +181,12 @@ index mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh
 
         // i nodes 
         indexed_dcopy(n_i_nodes, b, 1, resi, 1, i_nodes);
-        indexed_dgemv(n_i_nodes, n_v_nodes,
-            -1, A_data, incRowA, incColA,
+        indexed_sysed_spmv(n_i_nodes, n_v_nodes,
+            -1, A_sparse,
             x, 1,
             1, resi, 1, v_nodes, i_nodes);
-        indexed_dgemv(n_i_nodes, n_e_nodes,
-            -1, A_data, incRowA, incColA,
+        indexed_sysed_spmv(n_i_nodes, n_e_nodes,
+            -1, A_sparse,
             x, 1,
             1, resi, 1, e_nodes, i_nodes);
         
@@ -200,37 +195,32 @@ index mpi_gs(sed* A_sparse, coupling_data* coupling, comm_buffers* buffers, mesh
             resi[fixed[i]] = 0;
         }
 
-        // if (rank == 0) {
-        // 
-        //     printf("resi:\n");
-        //     for (int i = 0; i < n; i++) {
-        //         printf("%4.4lf\t",resi[i]);
-        //     }
-        //     printf("\n");
-        // }  
-
         // gauss-seidel step
         for (index i = 0; i < n_i_nodes; i++) {
             
             double dx = resi[i_nodes[i]];
+            dx -= Ax[i_nodes[i]] * x[i_nodes[i]];
             
             for (index j = 0; j < n_i_nodes; j++) {
-                dx -= A_data[i_nodes[i]*incRowA + i_nodes[j]*incColA] * x[i_nodes[j]];
+                
+                for (index p = Ai[i_nodes[i]] ; p < Ai[i_nodes[i]+1] ; p++) {
+                    if (Ai[p] == i_nodes[j]) {
+                        dx -= Ax[p] * x[Ai[p]];
+                        break;
+                    }
+                }
             }
             x[i_nodes[i]] += d[i_nodes[i]] * dx;
         }
 
-        //double* global_x = mpi_assemble_t1_vec(coupling, x, n);
-        
-        //free(global_x);
-
         // end gauss-seidel
-        indexed_dcopy(n_i_nodes, resi, 1, w, 1, i_nodes);
-        indexed_dgemv(n_i_nodes, n_i_nodes,
-            -1, A_data, incRowA, incColA,
+
+        indexed_sysed_spmv(n_i_nodes, n_i_nodes,
+            -1, A_sparse,
             x, 1,
-            1, w, 1, i_nodes, i_nodes);
-        
+            1, resi, 1, i_nodes, i_nodes);
+        indexed_dcopy(n_i_nodes, resi, 1, w, 1, i_nodes);
+
         // set fixed nodes back to zero
         for ( index i = 0; i < nfixed; ++i){
             w[fixed[i]] = 0;

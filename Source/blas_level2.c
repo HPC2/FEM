@@ -56,7 +56,7 @@ indexed_sysed_spmv(
            const index *indices_y)
 {
     // HELP :(
-    index p, j, *Ai ;
+    index p, p_end, j, *Ai ;
     double *Ax;
 
     // For convenience
@@ -66,33 +66,35 @@ indexed_sysed_spmv(
     // Scal y
     indexed_dscal(m, beta, y, incY, indices_y);
 
-    if (alpha==0 || n==0) {
+    if (alpha==0 || n==0 || m==0) {
         return;
+    }
+
+    if (indices_y[0] == indices_x[0]) {
+        for (j = 0 ; j < m ; j++)
+        {
+            y[indices_y[j]*incY] += alpha*Ax[indices_y[j]] * x[indices_y[j]*incX] ;
+        }
     }
 
     for (j = 0 ; j < m ; j++)
     {
-        
-        // Diagonal
-        y[indices_y[j]*incY] += alpha*Ax[indices_y[j]] * x[indices_y[j]*incX] ;
-
-        index offset_x = 0;
-        index offset_y = 0;
-        // Sub/Super-Diagonal
-        for (p = Ai[indices_y[j]+1]-1 ; p >= Ai[indices_y[j]] ; p--)
-        {  
-            // printf("%td\n", Ai[p]) ;
-            if (Ai[p] == indices_x[offset_x]) {
-                ++offset_x;
-                // upper part ddot-based
-                y[indices_y[j]*incY] += alpha * Ax[p] * x[Ai[p]*incX] ;
+        for (int i = 0; i < n; i++) {
+            p = Ai[indices_y[j]];
+            p_end = Ai[indices_y[j]+1];
+            if(indices_x[i] >= Ai[p] && indices_x[i] <= Ai[p_end-1]) {
+                for (; p < p_end ; p++) {
+                    if (Ai[p] == indices_x[i]) {
+                        y[indices_y[j]*incY] += alpha * Ax[p] * x[Ai[p]*incX] ;
+                        break;
+                    }
+                }
             }
-            if (Ai[p] == indices_y[offset_y]) {
-                ++offset_y;
-                // lower part axpy-based
-                y[Ai[p]*incY] += alpha * Ax[p] * x[indices_y[j]*incX] ;
-            }
-            
+            // for (p = Ai[indices_x[i]] ; p < Ai[indices_x[i]+1] ; p++) {
+            //     if (Ai[p] == indices_y[j]) {
+            //         y[Ai[p]*incY] += alpha * Ax[p] * x[indices_x[i]*incX] ;
+            //     }
+            // }
         }
     }
 }

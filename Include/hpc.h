@@ -228,6 +228,8 @@ writes the local to global numbering matrix
 */
 void write_l2g(index* l2g_numbering, index n_rows, index n_cols, index refinements);
 
+
+sed* symmetrize_sed(sed* A);
 /*
 Writes mesh to .co .el .bd files
 @param Mesh mesh to write

@@ -130,17 +130,11 @@ int main(int argc, char **argv) {
     mesh* local_mesh = mesh_create_rect(1, 1, boundaries, offset_x, offset_y, size_x, size_y);
     local_mesh = mesh_multi_refine(local_mesh, refinements);
 
-    if (rank == 0) {
-      mesh_write(local_mesh, "../Problem/before");
-    }
 
     if (!strcmp(solver, gauss_seidel)) {
       mesh_flip_edge(local_mesh);
     }
 
-    if (rank == 0) {
-      mesh_write(local_mesh, "../Problem/after");
-    }
 
     local_mesh->fixed = mesh_getFixed( local_mesh->ncoord, 
                                  local_mesh->bdry, 
@@ -169,6 +163,9 @@ int main(int argc, char **argv) {
     // Build stiffness matrix
     TIME_SAVE(10);
     if ( !sed_buildS(local_mesh, A) ) return(1); // assemble coefficient matrix
+    if (!strcmp(solver, gauss_seidel)) {
+      A = symmetrize_sed(A);
+    }
     MPI_Barrier(MPI_COMM_WORLD);
     TIME_SAVE(11);
 
@@ -258,13 +255,13 @@ int main(int argc, char **argv) {
 
 
     // save A, x and b 
-    double* global_x = mpi_assemble_t1_vec(coupling, x, n);
+    // double* global_x = mpi_assemble_t1_vec(coupling, x, n);
     // double* global_rhs = mpi_assemble_t2_vec(coupling, b, n);
     // double* global_A   = mpi_assemble_A(A, coupling);
     if (rank == 0) {
-        char buf[200];
-        sprintf(buf, "../Problem/x_mpi_%s", solver);
-        print_dmatrix(global_x, n_global_nodes, 1, false, buf, "dat");
+        // char buf[200];
+        // sprintf(buf, "../Problem/x_mpi_%s", solver);
+        // print_dmatrix(global_x, n_global_nodes, 1, false, buf, "dat");
         // print_dmatrix(global_rhs, n_global_nodes, 1, false, "../Problem/b-test", "dat");
         // print_dmatrix(global_A, n_global_nodes, n_global_nodes, true, "../Problem/A-test", "dat");
     }
