@@ -41,12 +41,12 @@ make mpi > /dev/null
 echo "make seq"
 make seq > /dev/null
 
-RESULT_NAME="main_v2"
+RESULT_NAME="main_v3"
 
 declare -a SOLVER=(
+    "jacobi"
     "cg"
     "pcg"
-    "jacobi"
 )
 
 for s in "${SOLVER[@]}";do
@@ -61,7 +61,7 @@ for s in "${SOLVER[@]}";do
     hostfile 0 0 0 0 0 0 0 12
     run_experiment 30 50 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 0 $s $RESULT_NAME"
     run_experiment 30 50 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 1 $s $RESULT_NAME"
-    run_experiment 30 50 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 2 $s $RESULT_NAME"
+    run_experiment 10 30 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 2 $s $RESULT_NAME"
     run_experiment $warmup_high 15 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 3 $s $RESULT_NAME"
     run_experiment $warmup_low 15 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 4 $s $RESULT_NAME"
     run_experiment $warmup_low 10 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 5 $s $RESULT_NAME"
@@ -70,7 +70,7 @@ for s in "${SOLVER[@]}";do
     hostfile 0 0 0 0 0 0 0 12
     run_experiment 30 50 "mpirun -np 12 --hostfile hostfile mpi_fem 12 1 0 $s $RESULT_NAME"
     run_experiment 30 50 "mpirun -np 12 --hostfile hostfile mpi_fem 12 1 1 $s $RESULT_NAME"
-    run_experiment 30 50 "mpirun -np 12 --hostfile hostfile mpi_fem 12 1 2 $s $RESULT_NAME"
+    run_experiment 10 30 "mpirun -np 12 --hostfile hostfile mpi_fem 12 1 2 $s $RESULT_NAME"
     run_experiment $warmup_high 15 "mpirun -np 12 --hostfile hostfile mpi_fem 12 1 3 $s $RESULT_NAME"
     run_experiment $warmup_low 15 "mpirun -np 12 --hostfile hostfile mpi_fem 12 1 4 $s $RESULT_NAME"
     run_experiment $warmup_low 10 "mpirun -np 12 --hostfile hostfile mpi_fem 12 1 5 $s $RESULT_NAME"
@@ -78,7 +78,7 @@ for s in "${SOLVER[@]}";do
     # SEQ 4x3
     run_experiment 30 50 "./seq_fem 4 3 0 $s $RESULT_NAME"
     run_experiment 30 50 "./seq_fem 4 3 1 $s $RESULT_NAME"
-    run_experiment 10 30 "./seq_fem 4 3 2 $s $RESULT_NAME"
+    run_experiment $warmup_high 30 "./seq_fem 4 3 2 $s $RESULT_NAME"
     run_experiment $warmup_high 15 "./seq_fem 4 3 3 $s $RESULT_NAME"
     run_experiment $warmup_low 15 "./seq_fem 4 3 4 $s $RESULT_NAME"
     run_experiment $warmup_low 10 "./seq_fem 4 3 5 $s $RESULT_NAME"
@@ -97,16 +97,29 @@ for s in "${SOLVER[@]}";do
     # MPI 4x4
     hostfile 0 0 0 0 0 0 8 8
     run_experiment 30 50 "mpirun -np 16 --hostfile hostfile mpi_fem 4 4 2 $s $RESULT_NAME"
-    run_experiment 30 50 "mpirun -np 16 --hostfile hostfile mpi_fem 4 4 3 $s $RESULT_NAME"
+    run_experiment 10 30 "mpirun -np 16 --hostfile hostfile mpi_fem 4 4 3 $s $RESULT_NAME"
     run_experiment $warmup_high 20 "mpirun -np 16 --hostfile hostfile mpi_fem 4 4 4 $s $RESULT_NAME"
     run_experiment $warmup_high 20 "mpirun -np 16 --hostfile hostfile mpi_fem 4 4 5 $s $RESULT_NAME"
     # MPI 8x8
     hostfile 8 8 8 8 8 8 8 8
     run_experiment 30 50 "mpirun -np 64 --hostfile hostfile mpi_fem 8 8 1 $s $RESULT_NAME"
     run_experiment 20 50 "mpirun -np 64 --hostfile hostfile mpi_fem 8 8 2 $s $RESULT_NAME"
-    run_experiment 10 30 "mpirun -np 64 --hostfile hostfile mpi_fem 8 8 3 $s $RESULT_NAME"
+    run_experiment $warmup_high 30 "mpirun -np 64 --hostfile hostfile mpi_fem 8 8 3 $s $RESULT_NAME"
     run_experiment $warmup_high 10 "mpirun -np 64 --hostfile hostfile mpi_fem 8 8 4 $s $RESULT_NAME"
 done
+
+
+hostfile 0 0 0 0 0 0 0 12
+run_experiment 30 50 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 1 gs $RESULT_NAME"
+run_experiment 10 30 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 2 gs $RESULT_NAME"
+run_experiment $warmup_high 15 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 3 gs $RESULT_NAME"
+run_experiment $warmup_low 15 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 4 gs $RESULT_NAME"
+
+run_experiment 30 50 "./seq_fem 4 3 0 gs $RESULT_NAME"
+run_experiment 30 50 "./seq_fem 4 3 1 gs $RESULT_NAME"
+run_experiment $warmup_high 30 "./seq_fem 4 3 2 gs $RESULT_NAME"
+run_experiment $warmup_high 15 "./seq_fem 4 3 3 gs $RESULT_NAME"
+run_experiment $warmup_low 15 "./seq_fem 4 3 4 gs $RESULT_NAME"
 
 exit 0
 
