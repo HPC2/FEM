@@ -60,9 +60,9 @@ void mpi_sum_interfaces(coupling_data* coupling, double* x, double* if_buffer_se
                 x[if_nodes[j]] += if_buffer_recv[j]; // accumulating
             }
         }
-        struct timeval t1; gettimeofday(&t1, (struct timezone*)0);
-        if_comm += (size_t) (1.E+6*(t1.tv_sec-t0.tv_sec)+(t1.tv_usec-t0.tv_usec));
     }
+    struct timeval t1; gettimeofday(&t1, (struct timezone*)0);
+        if_comm += (size_t) (1.E+6*(t1.tv_sec-t0.tv_sec)+(t1.tv_usec-t0.tv_usec));
 }
 
 void mpi_convert_type2_to_type1(coupling_data* coupling, double* x, comm_buffers* buffers) {
