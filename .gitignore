@@ -69,3 +69,4 @@ Demo/mpi_fem
 *.dat
 Result/*.csv
 !Result/result_run_23_06_08.csv
+!Result/result_main_v3_23-06-12.csv
