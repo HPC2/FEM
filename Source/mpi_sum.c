@@ -48,11 +48,17 @@ void mpi_sum_interfaces(coupling_data* coupling, double* x, double* if_buffer_se
         }
 
         if(rank == left) { // I am left and communicate with right
-            MPI_Send(if_buffer_send, n_nodes_interface, MPI_DOUBLE, color==-1? MPI_PROC_NULL : right, 0, MPI_COMM_WORLD);
-            MPI_Recv(if_buffer_recv, n_nodes_interface, MPI_DOUBLE, color==-1? MPI_PROC_NULL : right, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Sendrecv(if_buffer_send, n_nodes_interface, MPI_DOUBLE, color==-1? MPI_PROC_NULL : right, 0,
+                        if_buffer_recv, n_nodes_interface, MPI_DOUBLE, color==-1? MPI_PROC_NULL : right, 0, 
+                        MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            // MPI_Send(if_buffer_send, n_nodes_interface, MPI_DOUBLE, color==-1? MPI_PROC_NULL : right, 0, MPI_COMM_WORLD);
+            // MPI_Recv(if_buffer_recv, n_nodes_interface, MPI_DOUBLE, color==-1? MPI_PROC_NULL : right, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         }else{             // I am right and communicate with left
-            MPI_Recv(if_buffer_recv, n_nodes_interface, MPI_DOUBLE, color==-1? MPI_PROC_NULL : left, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            MPI_Send(if_buffer_send, n_nodes_interface, MPI_DOUBLE, color==-1? MPI_PROC_NULL : left, 0, MPI_COMM_WORLD);
+            MPI_Sendrecv(if_buffer_send, n_nodes_interface, MPI_DOUBLE, color==-1? MPI_PROC_NULL : left, 0,
+                        if_buffer_recv, n_nodes_interface, MPI_DOUBLE, color==-1? MPI_PROC_NULL : left, 0, 
+                        MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            // MPI_Send(if_buffer_send, n_nodes_interface, MPI_DOUBLE, color==-1? MPI_PROC_NULL : left, 0, MPI_COMM_WORLD);
+            // MPI_Recv(if_buffer_recv, n_nodes_interface, MPI_DOUBLE, color==-1? MPI_PROC_NULL : left, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         }
 
         if(color > -1) {
