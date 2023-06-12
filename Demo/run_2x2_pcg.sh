@@ -50,5 +50,6 @@ run_experiment 0 5 "./seq_fem 2 2 7 pcg $RESULT_NAME"
 run_experiment 0 3 "./seq_fem 2 2 8 pcg $RESULT_NAME"
 run_experiment 0 1 "./seq_fem 2 2 9 pcg $RESULT_NAME"
 
+echo "finished"
 exit 0
 

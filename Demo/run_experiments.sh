@@ -76,18 +76,18 @@ for s in "${SOLVER[@]}";do
     run_experiment $warmup_low 10 "mpirun -np 12 --hostfile hostfile mpi_fem 12 1 5 $s $RESULT_NAME"
     run_experiment $warmup_low 5 "mpirun -np 12 --hostfile hostfile mpi_fem 12 1 6 $s $RESULT_NAME"
     # SEQ 4x3
-    run_experiment 30 50 "./seq_fem 4 3 0 $s $RESULT_NAME"
-    run_experiment 30 50 "./seq_fem 4 3 1 $s $RESULT_NAME"
-    run_experiment $warmup_high 30 "./seq_fem 4 3 2 $s $RESULT_NAME"
-    run_experiment $warmup_high 15 "./seq_fem 4 3 3 $s $RESULT_NAME"
-    run_experiment $warmup_low 15 "./seq_fem 4 3 4 $s $RESULT_NAME"
-    run_experiment $warmup_low 10 "./seq_fem 4 3 5 $s $RESULT_NAME"
-    run_experiment $warmup_low 5 "./seq_fem 4 3 6 $s $RESULT_NAME"
-    # SEQ 1x1
-    run_experiment $warmup_high 20 "./seq_fem 1 1 4 $s $RESULT_NAME"
-    run_experiment $warmup_high 20 "./seq_fem 1 1 5 $s $RESULT_NAME"
-    run_experiment $warmup_low 20 "./seq_fem 1 1 6 $s $RESULT_NAME"
-    run_experiment $warmup_low 5 "./seq_fem 1 1 7 $s $RESULT_NAME"
+    # run_experiment 30 50 "./seq_fem 4 3 0 $s $RESULT_NAME"
+    # run_experiment 30 50 "./seq_fem 4 3 1 $s $RESULT_NAME"
+    # run_experiment $warmup_high 30 "./seq_fem 4 3 2 $s $RESULT_NAME"
+    # run_experiment $warmup_high 15 "./seq_fem 4 3 3 $s $RESULT_NAME"
+    # run_experiment $warmup_low 15 "./seq_fem 4 3 4 $s $RESULT_NAME"
+    # run_experiment $warmup_low 10 "./seq_fem 4 3 5 $s $RESULT_NAME"
+    # run_experiment $warmup_low 5 "./seq_fem 4 3 6 $s $RESULT_NAME"
+    # # SEQ 1x1
+    # run_experiment $warmup_high 20 "./seq_fem 1 1 4 $s $RESULT_NAME"
+    # run_experiment $warmup_high 20 "./seq_fem 1 1 5 $s $RESULT_NAME"
+    # run_experiment $warmup_low 20 "./seq_fem 1 1 6 $s $RESULT_NAME"
+    # run_experiment $warmup_low 5 "./seq_fem 1 1 7 $s $RESULT_NAME"
     # MPI 2x2
     hostfile 0 0 0 0 0 0 0 4
     run_experiment 30 50 "mpirun -np 4 --hostfile hostfile mpi_fem 2 2 3 $s $RESULT_NAME"
@@ -115,11 +115,11 @@ run_experiment 10 30 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 2 gs $RESULT
 run_experiment 5 15 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 3 gs $RESULT_NAME"
 run_experiment 0 15 "mpirun -np 12 --hostfile hostfile mpi_fem 4 3 4 gs $RESULT_NAME"
 
-run_experiment 30 50 "./seq_fem 4 3 0 gs $RESULT_NAME"
-run_experiment 30 50 "./seq_fem 4 3 1 gs $RESULT_NAME"
-run_experiment 5 30 "./seq_fem 4 3 2 gs $RESULT_NAME"
-run_experiment 5 15 "./seq_fem 4 3 3 gs $RESULT_NAME"
-run_experiment 0 15 "./seq_fem 4 3 4 gs $RESULT_NAME"
+# run_experiment 30 50 "./seq_fem 4 3 0 gs $RESULT_NAME"
+# run_experiment 30 50 "./seq_fem 4 3 1 gs $RESULT_NAME"
+# run_experiment 5 30 "./seq_fem 4 3 2 gs $RESULT_NAME"
+# run_experiment 5 15 "./seq_fem 4 3 3 gs $RESULT_NAME"
+# run_experiment 0 15 "./seq_fem 4 3 4 gs $RESULT_NAME"
 
 exit 0
 

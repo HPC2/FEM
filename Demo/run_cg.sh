@@ -91,5 +91,6 @@ run_experiment 0 3 "mpirun -np 16 --hostfile hostfile mpi_fem 1 16 8 cg $RESULT_
 run_experiment 0 1 "mpirun -np 16 --hostfile hostfile mpi_fem 1 16 9 cg $RESULT_NAME"
 run_experiment 0 1 "mpirun -np 16 --hostfile hostfile mpi_fem 1 16 10 cg $RESULT_NAME"
 
+echo "finished"
 exit 0
 
