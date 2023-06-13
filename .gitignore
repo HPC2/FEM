@@ -72,3 +72,4 @@ Result/*.csv
 !Result/result_main_v3_23-06-12.csv
 !Result/2x2.csv
 !Result/cg_strip.csv
+!Result/square_eq_dof.csv
