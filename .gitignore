@@ -74,3 +74,4 @@ Result/*.csv
 !Result/cg_strip.csv
 !Result/square_eq_dof.csv
 !Result/square_eq_dof_v2.csv
+!Result/*.dat
