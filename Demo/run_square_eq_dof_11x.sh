@@ -13,12 +13,12 @@ function run_experiment() {
     RUNS=$2
     EXPERIMENT=$3
     if [ $WARMUPS -gt 0 ]; then
-        echo "Warmup experiment '$EXPERIMENT' $WARMUPS times" > $LOGFILE
+        echo "Warmup experiment '$EXPERIMENT' $WARMUPS times" >> $LOGFILE
         for i in `seq 1 $WARMUPS`; do
             eval "${EXPERIMENT}_warmup"
         done
     fi
-    echo "Run experiment '$EXPERIMENT' $RUNS times" > $LOGFILE
+    echo "Run experiment '$EXPERIMENT' $RUNS times" >> $LOGFILE
     for i in `seq 1 $RUNS`; do
         eval "${EXPERIMENT}"
     done
@@ -31,8 +31,8 @@ LOGFILE="../Result/$RESULT.log"
 echo "Logging into $LOGFILE"
 echo "Saving into result_$RESULT.csv"
 
-run_experiment $2 $3 "./seq_fem 1 1 $1 cg $RESULT_NAME"
+run_experiment $2 $3 "./seq_fem 1 1 $1 cg $RESULT"
 
-echo "finished" > $LOGFILE
+echo "finished" >> $LOGFILE
 exit 0
 
