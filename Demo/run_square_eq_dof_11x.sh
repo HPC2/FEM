@@ -31,8 +31,8 @@ LOGFILE="../Result/$RESULT.log"
 echo "Logging into $LOGFILE"
 echo "Saving into result_$RESULT.csv"
 
-#run_experiment $2 $3 "./seq_fem 1 1 $1 cg $RESULT_NAME"
-echo "$2 $3 ./seq_fem 1 1 $1 cg $RESULT_NAME"
+run_experiment $2 $3 "./seq_fem 1 1 $1 cg $RESULT_NAME"
+
 echo "finished" > $LOGFILE
 exit 0
 
